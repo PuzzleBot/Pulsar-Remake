@@ -73,11 +73,12 @@ GLubyte  world[WORLDX][WORLDY][WORLDZ];
 
 #define LEFTWALL 20
 #define BOTTOMWALL 20
-#define ROOMSIZE 5
+#define ROOMSIZE 9
 #define GRIDSIZE 6
 #define FLOORHEIGHT 10
 
 #define STARTING_WALLS 25
+#define WALL_HEIGHT 5
 
 /*Collision and gravity*/
 #define COLLISION_REPULSION 0.15
@@ -89,6 +90,10 @@ GLubyte  world[WORLDX][WORLDY][WORLDZ];
 /*Limit the number of player bullets on the screen at once*/
 #define MAX_BULLETS 12
 #define BULLETLIFE 1500
+
+#define MOB_BULLET_ARRAY_START MAX_BULLETS
+
+typedef enum{FALSE, TRUE} Boolean;
 
 
 /*Wall state data type*/
@@ -103,13 +108,13 @@ typedef struct{
 typedef struct anim_list{
     /*Location of the wall in the wall array*/
     int targetWallIndex[2];
-    
+
     /*Which array is it in - the x_walls array (1) or z_walls array (0)?*/
     int isXwall;
-    
+
     /*Current frame of animation - animation is completed when this reaches zero*/
     int animationState;
-    
+
     /*Linked list*/
     struct anim_list * next;
     struct anim_list * prev;
@@ -121,16 +126,42 @@ typedef struct{
     double x_pos;
     double y_pos;
     double z_pos;
-    
+
     double yOrientation;
-    
+
     double x_velocity;
     double y_velocity;
     double z_velocity;
-    
+
     int existsInWorld;
     int lifeTimer;
 } Bullet;
+
+
+/*Mob structures*/
+typedef enum{ROAMING, DODGING} MobState;
+typedef enum{ORBITER, PULSAR} MobType;
+
+typedef struct MobChain{
+    MobType type;
+    double x_velocity;
+    double y_velocity;
+    double z_velocity;
+
+    double x_pos;
+    double y_pos;
+    double z_pos;
+
+    double x_destination;
+    double y_destination;
+    double z_destination;
+
+    int currentAnimationFrame;
+    MobState currentAiState;
+
+    struct MobChain * next;
+    struct MobChain * prev;
+} Mob;
 
 
 /* Wall functions */
@@ -176,3 +207,15 @@ void moveAllBullets();
 void bulletCollision(int bulletId);
 
 void removeBullet(int bulletId);
+
+
+/*Mob Functions*/
+Mob * createNewMob(MobType type, double x, double y, double z);
+void generateValidMobPosition(int * x, int * y, int * z);
+Mob * mobAddToFront(Mob * mobList, Mob * newMob);
+Mob * mobDeleteFromFront(Mob * mobList);
+Mob * generateRandomMobs(int count);
+Boolean checkMobCollision(double destinationX, double destinationY, double destinationZ, Mob * mob);
+void animateSingleMob(Mob * mob);
+void animateAllMobs();
+void worldMobInit();

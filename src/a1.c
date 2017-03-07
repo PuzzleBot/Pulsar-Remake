@@ -87,7 +87,8 @@ int wallTimer = 0;
 int wallAnimationTimer = 0;
 AnimationList * animationQueue = NULL;
 
-
+extern Mob * mobList;
+int mobTimer = 0;
 
 /*** collisionResponse() ***/
 /* -performs collision detection and response */
@@ -96,45 +97,45 @@ AnimationList * animationQueue = NULL;
 /* note that the world coordinates returned from getViewPosition()
  will be the negative value of the array indices */
 void collisionResponse() {
-    
+
     /* your collision code goes here */
     float newX, newY, newZ;
     float oldX, oldY, oldZ;
-    
+
     int oldBlockX, oldBlockY, oldBlockZ;
     int newBlockX, newBlockY, newBlockZ;
-    
+
     getOldViewPosition(&oldX, &oldY, &oldZ);
     getViewPosition(&newX, &newY, &newZ);
-    
+
     oldX = -oldX;
     oldY = -oldY;
     oldZ = -oldZ;
-    
+
     newX = -newX;
     newY = -newY;
     newZ = -newZ;
-    
+
     /*Calculate the corresponding world block of the old viewpoint location*/
     oldBlockX = (int)(floor(oldX));
     oldBlockY = (int)(floor(oldY));
     oldBlockZ = (int)(floor(oldZ));
-    
+
     /*Calculate the corresponding world block of the new viewpoint location*/
     newBlockX = (int)(floor(newX));
     newBlockY = (int)(floor(newY));
     newBlockZ = (int)(floor(newZ));
-    
+
     /*
     printf("Old position: %.2f %.2f %.2f\n", oldX, oldY, oldZ);
     printf("New position: %.2f %.2f %.2f\n", newX, newY, oldZ);
     printf("Block: %d %d %d\n", newBlockX, newBlockY, newBlockZ);
      */
-    
+
     /*Check for collision or out of bounds*/
     if((world[newBlockX][newBlockY][newBlockZ] != 0) || (world[newBlockX][newBlockY+1][newBlockZ] != 0) || (newBlockX >= WORLDX) || (newBlockX <= 0) || (newBlockY >= WORLDY) || (newBlockY <= 0) || (newBlockZ >= WORLDZ) || (newBlockZ <= 0)){
         /*printf("Collision: %d %d %d\n", newBlockX, newBlockY, newBlockZ);*/
-        
+
         if(newBlockZ < oldBlockZ){
             /*Climb 1-block high walls*/
             if((world[newBlockX][newBlockY+1][newBlockZ] == 0) && (world[newBlockX][newBlockY+2][newBlockZ] == 0) && (world[newBlockX][newBlockY][newBlockZ] != 0)){
@@ -157,7 +158,7 @@ void collisionResponse() {
                 newZ = oldZ;
             }
         }
-        
+
         if(newBlockX < oldBlockX){
             /*Climb 1-block high walls*/
             if((world[newBlockX][newBlockY+1][newBlockZ] == 0) && (world[newBlockX][newBlockY+2][newBlockZ] == 0) && (world[newBlockX][newBlockY][newBlockZ] != 0)){
@@ -180,26 +181,26 @@ void collisionResponse() {
                 newX = oldX;
             }
         }
-        
+
         if(newBlockY > oldBlockY){
             /*Bottom side detection*/
             oldY = floor(newY) - COLLISION_REPULSION;
             newY = oldY;
         }
-        
+
         /*Different collision detection for the floor - see below*/
         if(!(newBlockY < oldBlockY)){
             setViewPosition(-newX, -newY, -newZ);
         }
     }
-    
+
     if((newY < oldY) &&
        ((world[newBlockX][(int)floor(newY - UPWARD_REPULSION)][newBlockZ] != 0) || ((int)floor(newY - UPWARD_REPULSION) < 0))){
         /*Top side detection - different in order to keep the
          viewpoint at a certain height*/
         oldY = ceil(newY - UPWARD_REPULSION) + UPWARD_REPULSION - 0.01;
         newY = oldY;
-        
+
         setViewPosition(-newX, -newY, -newZ);
     }
 }
@@ -214,21 +215,21 @@ void collisionResponse() {
 /*	set2Dcolour(float []); 				*/
 /* colour must be set before other functions are called	*/
 void draw2D() {
-    
+
     if (testWorld) {
         /* draw some sample 2d shapes */
         GLfloat green[] = {0.0, 0.5, 0.0, 0.5};
         set2Dcolour(green);
         draw2Dline(0, 0, 500, 500, 15);
         draw2Dtriangle(0, 0, 200, 200, 0, 200);
-        
+
         GLfloat black[] = {0.0, 0.0, 0.0, 0.5};
         set2Dcolour(black);
         draw2Dbox(500, 380, 524, 388);
     } else {
-        
+
         /* your code goes here */
-        
+
         /*Draw the minimap*/
         if(displayMap == 1){
             drawSmallMinimap();
@@ -236,9 +237,9 @@ void draw2D() {
         else if(displayMap == 2){
             drawFullMap();
         }
-        
+
     }
-    
+
 }
 
 
@@ -253,12 +254,12 @@ void update() {
     int secondsSinceUpdate;
     int microSecsSinceUpdate;
     float *la;
-    
-    
+
+
     /* sample animation for the test world, don't remove this code */
     /* -demo of animating mobs */
     if (testWorld) {
-        
+
         /* sample of rotation and positioning of mob */
         /* coordinates for mob 0 */
         static float mob0x = 50.0, mob0y = 25.0, mob0z = 52.0;
@@ -268,11 +269,11 @@ void update() {
         static float mob1x = 50.0, mob1y = 25.0, mob1z = 52.0;
         static float mob1ry = 0.0;
         static int increasingmob1 = 1;
-        
+
         /* move mob 0 and rotate */
         /* set mob 0 position */
         setMobPosition(0, mob0x, mob0y, mob0z, mob0ry);
-        
+
         /* move mob 0 in the x axis */
         if (increasingmob0 == 1)
             mob0x += 0.2;
@@ -280,14 +281,14 @@ void update() {
             mob0x -= 0.2;
         if (mob0x > 50) increasingmob0 = 0;
         if (mob0x < 30) increasingmob0 = 1;
-        
+
         /* rotate mob 0 around the y axis */
         mob0ry += 1.0;
         if (mob0ry > 360.0) mob0ry -= 360.0;
-        
+
         /* move mob 1 and rotate */
         setMobPosition(1, mob1x, mob1y, mob1z, mob1ry);
-        
+
         /* move mob 1 in the z axis */
         /* when mob is moving away it is visible, when moving back it */
         /* is hidden */
@@ -300,29 +301,29 @@ void update() {
         }
         if (mob1z > 72) increasingmob1 = 0;
         if (mob1z < 52) increasingmob1 = 1;
-        
+
         /* rotate mob 1 around the y axis */
         mob1ry += 1.0;
         if (mob1ry > 360.0) mob1ry -= 360.0;
         /* end testworld animation */
-        
+
     } else {
         /* your code goes here */
-        
+
         /*Performance cap - 30 FPS*/
         gettimeofday(&currentTime, NULL);
-        
+
         /*Get the number of seconds since the last update. Only allow
           updates 30 times per second. (1 000 000 microseconds/sec divided by 30)*/
         secondsSinceUpdate = difftime(currentTime.tv_sec, previousUpdate.tv_sec);
         microSecsSinceUpdate = (int)currentTime.tv_usec - (int)previousUpdate.tv_usec;
-        
+
         if((microSecsSinceUpdate > 1000000/FPS_CAP) || (secondsSinceUpdate >= 1)){
             /*Gravity*/
             float viewX;
             float viewY;
             float viewZ;
-            
+
             if(flycontrol == 0){
                 getViewPosition(&viewX, &viewY, &viewZ);
                 setOldViewPosition(viewX, viewY, viewZ);
@@ -330,30 +331,38 @@ void update() {
                 setViewPosition(viewX, viewY, viewZ);
                 collisionResponse();
             }
-            
+
             /*Wall Movement*/
             wallTimer++;
             if(wallTimer >= FPS_CAP){
                 wallTimer = 0;
-                
+
                 /*Open/close walls at random*/
                 /*toggleRandomWall();*/
                 toggleTwoWalls();
             }
-            
+
             wallAnimationTimer++;
             if(wallAnimationTimer >= FPS_CAP/10){
                 wallAnimationTimer = 0;
                 processAllAnimations();
             }
-            
+
             /*Bullet movement*/
             moveAllBullets();
+
+
+            /*AI movement*/
+            mobTimer++;
+            if(mobTimer >= FPS_CAP/6){
+                mobTimer = 0;
+                animateAllMobs(mobList);
+            }
 
             glutPostRedisplay();
             gettimeofday(&previousUpdate, NULL);
         }
-        
+
     }
 }
 
@@ -364,7 +373,7 @@ void update() {
 /* -x,y are the screen coordinates when the mouse is pressed or */
 /*  released */
 void mouse(int button, int state, int x, int y) {
-    
+
     if (button == GLUT_LEFT_BUTTON){
         //printf("left button - ");
         if(state != GLUT_UP){
@@ -377,14 +386,14 @@ void mouse(int button, int state, int x, int y) {
     else{
         //printf("right button - ");
     }
-    
+
     if (state == GLUT_UP){
         //printf("up - ");
     }
     else{
         //printf("down - ");
     }
-    
+
     //printf("%d %d\n", x, y);
 }
 
@@ -396,7 +405,7 @@ int main(int argc, char** argv)
 
     /* initialize the graphics system */
     graphicsInit(&argc, argv);
-    
+
     /* the first part of this if statement builds a sample */
     /* world which will be used for testing */
     /* DO NOT remove this code. */
@@ -409,7 +418,7 @@ int main(int argc, char** argv)
             for(j=0; j<WORLDY; j++)
                 for(k=0; k<WORLDZ; k++)
                     world[i][j][k] = 0;
-        
+
         /* some sample objects */
         /* build a red platform */
         for(i=0; i<WORLDX; i++) {
@@ -423,7 +432,7 @@ int main(int argc, char** argv)
         world[49][26][50] = 1;
         world[52][25][52] = 2;
         world[52][26][52] = 2;
-        
+
         /* blue box shows xy bounds of the world */
         for(i=0; i<WORLDX-1; i++) {
             world[i][25][0] = 2;
@@ -433,18 +442,20 @@ int main(int argc, char** argv)
             world[0][25][i] = 2;
             world[WORLDX-1][25][i] = 2;
         }
-        
+
         /* create two sample mobs */
         /* these are animated in the update() function */
         createMob(0, 50.0, 25.0, 52.0, 0.0);
         createMob(1, 50.0, 25.0, 52.0, 0.0);
-        
+
         /* create sample player */
         createPlayer(0, 52.0, 27.0, 52.0, 0.0);
-        
+
     } else {
-        
+
         /* your code to build the world goes here */
+        /*RNG seed*/
+        srand(time(NULL));
         buildStaticObjects();
         /*Initialize the walls array*/
         for(i = 0; i < GRIDSIZE+1; i++){
@@ -454,24 +465,22 @@ int main(int argc, char** argv)
             }
         }
         initializeWalls();
-        
-        /*RNG seed*/
-        srand(time(NULL));
-        
+        worldMobInit();
+
         setViewPosition(-(LEFTWALL+2), -(FLOORHEIGHT+2), -(BOTTOMWALL+2));
         glutWarpPointer(512, 384);
         motion(512, 384);
-        
+
+
         /*Debug line for viewing the world from the top, uncomment to use*/
         /*setViewPosition(-10, -38, -30);*/
-        
+
         gettimeofday(&previousUpdate, NULL);
-        
+
     }
-    
+
     /* starts the graphics processing loop */
     /* code after this will not run until the program exits */
     glutMainLoop();
-    return 0; 
+    return 0;
 }
-
