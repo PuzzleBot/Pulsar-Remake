@@ -81,12 +81,18 @@ struct timeval previousUpdate;
 
 
 /*Arrays of walls - one for walls parallel to the x-axis, and one for walls parallel to the z-axis*/
-Wall x_walls[GRIDSIZE][GRIDSIZE+1];
-Wall z_walls[GRIDSIZE+1][GRIDSIZE];
+extern Wall z_walls[GRIDSIZE][GRIDSIZE-1];
+extern Wall x_walls[GRIDSIZE-1][GRIDSIZE];
 int wallTimer = 0;
 int wallAnimationTimer = 0;
 AnimationList * animationQueue = NULL;
 
+
+/*Array of empty cells, walls between them, and pillars - basically a higher level grid of the play area*/
+extern HighGrid waypointGrid[(GRIDSIZE * 2)][(GRIDSIZE * 2)];
+
+
+/*Linked list of mobs - we're iterating over all of the live ones anyway to update, so why not a list?*/
 extern Mob * mobList;
 int mobTimer = 0;
 
@@ -340,6 +346,7 @@ void update() {
                 /*Open/close walls at random*/
                 /*toggleRandomWall();*/
                 toggleTwoWalls();
+                printWaypointGrid();
             }
 
             wallAnimationTimer++;
@@ -354,7 +361,7 @@ void update() {
 
             /*AI movement*/
             mobTimer++;
-            if(mobTimer >= FPS_CAP/6){
+            if(mobTimer >= FPS_CAP/15){
                 mobTimer = 0;
                 animateAllMobs(mobList);
             }
@@ -465,6 +472,7 @@ int main(int argc, char** argv)
             }
         }
         initializeWalls();
+        initWaypointGrid();
         worldMobInit();
 
         setViewPosition(-(LEFTWALL+2), -(FLOORHEIGHT+2), -(BOTTOMWALL+2));

@@ -1,8 +1,10 @@
 #include "graphics.h"
 
+extern HighGrid waypointGrid[(GRIDSIZE * 2)][(GRIDSIZE * 2)];
 Mob * mobList;
 
 Mob * createNewMob(MobType type, double x, double y, double z){
+    int i, j, k;
     Mob * newMob = calloc(1, sizeof(Mob));
 
     if(newMob == NULL){
@@ -17,6 +19,35 @@ Mob * createNewMob(MobType type, double x, double y, double z){
     newMob->z_pos = z;
 
     newMob->currentAiState = ROAMING;
+    newMob->currentHighGridCell[0] = 0;
+    newMob->currentHighGridCell[1] = 1;
+
+    /*Initialize the animation to a random frame for desync,
+      fill in the mob's space to prevent collision*/
+    switch(type){
+        case ORBITER:
+            newMob->currentAnimationFrame = rand() % 8;
+            for(i = -1; i <= 1; i++){
+                for(j = -1; j <= 1; j++){
+                    for(k = -1; k <= 1; k++){
+                        world[(int)x + i][(int)y + j][(int)z + k] = 8;
+                    }
+                }
+            }
+            break;
+        case PULSAR:
+            newMob->currentAnimationFrame = rand() % 4;
+            for(i = -1; i <= 1; i++){
+                for(j = -1; j <= 1; j++){
+                    for(k = -1; k <= 1; k++){
+                        world[(int)x + i][(int)y + j][(int)z + k] = 3;
+                    }
+                }
+            }
+            break;
+        default:
+            break;
+    }
 
     newMob->next = NULL;
     newMob->prev = NULL;
@@ -29,29 +60,44 @@ void generateValidMobPosition(int * x, int * y, int * z){
     static int horizRange = RIGHTWALL - LEFTWALL - 3;
     static int vertRange = TOPWALL - BOTTOMWALL - 3;
     static int mobHeight = FLOORHEIGHT + 2;
-    int randomX = rand() % horizRange;
-    int randomZ = rand() % vertRange;
+    int randomX;
+    int randomZ;
+    Boolean collisionDetected;
+    int i, j;
 
-    /*Prevent spawning in the starting cell unless it is the only one*/
-    if(((randomX <= ROOMSIZE) && (randomZ <= ROOMSIZE)) && (GRIDSIZE > 1)){
-        /*Fix it by offsetting x and z to the northeast cell*/
-        randomX = randomX + (ROOMSIZE + 1);
-        randomZ = randomZ + (ROOMSIZE + 1);
-    }
+    do{
+        randomX = rand() % horizRange;
+        randomZ = rand() % vertRange;
+        /*Prevent spawning in the starting cell unless it is the only one*/
+        if(((randomX <= ROOMSIZE) && (randomZ <= ROOMSIZE)) && (GRIDSIZE > 1)){
+            /*Fix it by offsetting x and z to the northeast cell*/
+            randomX = randomX + (ROOMSIZE + 1);
+            randomZ = randomZ + (ROOMSIZE + 1);
+        }
 
-    /*Avoid spawing the mob inside a wall
-      +1: W...... -> .W.....*/
-    if(((randomX + 1) % (ROOMSIZE+1)) <= 2){
-        randomX = randomX + 3;
-    }
+        /*Avoid spawing the mob inside a wall
+          +1: W...... -> .W.....*/
+        if(((randomX + 1) % (ROOMSIZE+1)) <= 2){
+            randomX = randomX + 3;
+        }
 
-    if(((randomZ + 1) % (ROOMSIZE+1)) <= 2){
-        randomZ = randomZ + 3;
-    }
+        if(((randomZ + 1) % (ROOMSIZE+1)) <= 2){
+            randomZ = randomZ + 3;
+        }
 
-    *x = randomX;
+        collisionDetected = FALSE;
+        for(i = -1; i <= 1; i++){
+            for(j = -1; j <= 1; j++){
+                if(world[LEFTWALL + randomX + i][mobHeight][BOTTOMWALL + randomZ + j] != 0){
+                    collisionDetected = TRUE;
+                }
+            }
+        }
+    } while(collisionDetected == TRUE);
+
+    *x = LEFTWALL + randomX;
     *y = mobHeight;
-    *z = randomZ;
+    *z = BOTTOMWALL + randomZ;
 }
 
 /*Linked list add to front - returns the head of the list*/
@@ -111,6 +157,8 @@ Mob * generateRandomMobs(int count){
         generateValidMobPosition(&mobX, &mobY, &mobZ);
         newMobList = mobAddToFront(newMobList, createNewMob(chosenType, mobX, mobY, mobZ));
     }
+
+    return(newMobList);
 }
 
 Boolean checkMobCollision(double destinationX, double destinationY, double destinationZ, Mob * mob){
@@ -257,10 +305,23 @@ void animateAllMobs(){
     }
 }
 
+void processMobAI(Mob * mob){
+    /*Detect line of sight, change ai state accordingly*/
+
+    if(mob->currentAiState == ROAMING){
+        /*If the mob is sitting still, start moving*/
+        if((mob->x_velocity <= 0.01) && (mob->y_velocity <= 0.01) && (mob->z_velocity <= 0.01)){
+
+        }
+
+
+    }
+    else if(mob->currentAiState == DODGING){
+
+    }
+}
+
 
 void worldMobInit(){
-    //mobList = generateRandomMobs(3);
-
-    mobList = mobAddToFront(mobList, createNewMob(ORBITER, LEFTWALL+15, 12, BOTTOMWALL+15));
-    mobList = mobAddToFront(mobList, createNewMob(PULSAR, LEFTWALL+23, 12, BOTTOMWALL+23));
+    mobList = generateRandomMobs(5);
 }

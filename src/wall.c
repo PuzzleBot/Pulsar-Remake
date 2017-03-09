@@ -1,8 +1,8 @@
 #include "graphics.h"
 
 
-extern Wall z_walls[GRIDSIZE][GRIDSIZE+1];
-extern Wall x_walls[GRIDSIZE+1][GRIDSIZE];
+Wall z_walls[GRIDSIZE][GRIDSIZE-1];
+Wall x_walls[GRIDSIZE-1][GRIDSIZE];
 extern AnimationList * animationQueue;
 
 extern void setViewPosition(float, float, float);
@@ -66,13 +66,13 @@ void initializeWalls(){
         chooseX = rand() % 2;
         if(chooseX == 1){
             /* Choose from x-alligned walls */
-            chosenRow = (rand() % (GRIDSIZE-1)) + 1;
+            chosenRow = (rand() % (GRIDSIZE-1));
             chosenCol = (rand() % GRIDSIZE);
 
             if(x_walls[chosenRow][chosenCol].state == OPEN){
                 for(i = 1; i <= ROOMSIZE; i++){
                     worldX = LEFTWALL + (chosenCol * (ROOMSIZE+1)) + i;
-                    worldZ = BOTTOMWALL + (chosenRow * (ROOMSIZE+1));
+                    worldZ = BOTTOMWALL + ((chosenRow + 1) * (ROOMSIZE+1));
 
                     /*"Build a wall" - Trump 2016*/
                     for(j = 1; j <= WALL_HEIGHT; j++){
@@ -87,11 +87,11 @@ void initializeWalls(){
         else{
             /* Choose from z-alligned walls */
             chosenRow = (rand() % GRIDSIZE);
-            chosenCol = (rand() % (GRIDSIZE-1)) + 1;
+            chosenCol = (rand() % (GRIDSIZE-1));
 
             if(z_walls[chosenRow][chosenCol].state == OPEN){
                 for(i = 1; i <= ROOMSIZE; i++){
-                    worldX = LEFTWALL + (chosenCol * (ROOMSIZE+1));
+                    worldX = LEFTWALL + ((chosenCol + 1) * (ROOMSIZE+1));
                     worldZ = BOTTOMWALL + (chosenRow * (ROOMSIZE+1)) + i;
 
                     /*"Build a wall, and make the OS pay for it"*/
@@ -120,7 +120,7 @@ void toggleRandomWall(){
         chooseX = rand() % 2;
         if(chooseX == 1){
             /* Choose from x-alligned walls */
-            chosenRow = (rand() % (GRIDSIZE-1)) + 1;
+            chosenRow = (rand() % (GRIDSIZE-1));
             chosenCol = (rand() % GRIDSIZE);
 
             if((x_walls[chosenRow][chosenCol].state == OPENING) || (x_walls[chosenRow][chosenCol].state == CLOSING)){
@@ -141,7 +141,7 @@ void toggleRandomWall(){
         else{
             /* Choose from z-alligned walls */
             chosenRow = (rand() % GRIDSIZE);
-            chosenCol = (rand() % (GRIDSIZE-1)) + 1;
+            chosenCol = (rand() % (GRIDSIZE-1));
 
             if((z_walls[chosenRow][chosenCol].state == OPENING) || (z_walls[chosenRow][chosenCol].state == CLOSING)){
                 toggleable = 0;
@@ -175,7 +175,7 @@ void toggleTwoWalls(){
         chooseX = rand() % 2;
         if(chooseX == 1){
             /* Choose from x-alligned walls */
-            chosenRow = (rand() % (GRIDSIZE-1)) + 1;
+            chosenRow = (rand() % (GRIDSIZE-1));
             chosenCol = (rand() % GRIDSIZE);
 
             if(x_walls[chosenRow][chosenCol].state != OPEN){
@@ -190,7 +190,7 @@ void toggleTwoWalls(){
         else{
             /* Choose from z-alligned walls */
             chosenRow = (rand() % GRIDSIZE);
-            chosenCol = (rand() % (GRIDSIZE-1)) + 1;
+            chosenCol = (rand() % (GRIDSIZE-1));
 
             if(z_walls[chosenRow][chosenCol].state != OPEN){
                 toggleable = 0;
@@ -212,7 +212,7 @@ void toggleTwoWalls(){
         chooseX = rand() % 2;
         if(chooseX == 1){
             /* Choose from x-alligned walls */
-            chosenRow = (rand() % (GRIDSIZE-1)) + 1;
+            chosenRow = (rand() % (GRIDSIZE-1));
             chosenCol = (rand() % GRIDSIZE);
 
             if(x_walls[chosenRow][chosenCol].state != CLOSED){
@@ -227,7 +227,7 @@ void toggleTwoWalls(){
         else{
             /* Choose from z-alligned walls */
             chosenRow = (rand() % GRIDSIZE);
-            chosenCol = (rand() % (GRIDSIZE-1)) + 1;
+            chosenCol = (rand() % (GRIDSIZE-1));
 
             if(z_walls[chosenRow][chosenCol].state != CLOSED){
                 toggleable = 0;
@@ -315,7 +315,7 @@ void processAllAnimations(){
             if(x_walls[currentAnimation->targetWallIndex[0]][currentAnimation->targetWallIndex[1]].state == CLOSING){
                 /*Fill in the cubes*/
                 worldX = LEFTWALL + (currentAnimation->targetWallIndex[1] * (ROOMSIZE+1)) + currentAnimation->animationState;
-                worldZ = BOTTOMWALL + (currentAnimation->targetWallIndex[0] * (ROOMSIZE+1));
+                worldZ = BOTTOMWALL + ((currentAnimation->targetWallIndex[0] + 1) * (ROOMSIZE+1));
 
                 for(i = 1; i <= WALL_HEIGHT; i++){
                     world[worldX][FLOORHEIGHT+i][worldZ] = 6;
@@ -351,7 +351,7 @@ void processAllAnimations(){
             else if(x_walls[currentAnimation->targetWallIndex[0]][currentAnimation->targetWallIndex[1]].state == OPENING){
                 /*Remove the cubes*/
                 worldX = LEFTWALL + (currentAnimation->targetWallIndex[1] * (ROOMSIZE+1)) + currentAnimation->animationState;
-                worldZ = BOTTOMWALL + (currentAnimation->targetWallIndex[0] * (ROOMSIZE+1));
+                worldZ = BOTTOMWALL + ((currentAnimation->targetWallIndex[0] + 1) * (ROOMSIZE+1));
                 for(i = 1; i <= WALL_HEIGHT; i++){
                     world[worldX][FLOORHEIGHT+i][worldZ] = 0;
                 }
@@ -369,7 +369,7 @@ void processAllAnimations(){
         else{
             if(z_walls[currentAnimation->targetWallIndex[0]][currentAnimation->targetWallIndex[1]].state == CLOSING){
                 /*Fill in the cubes*/
-                worldX = LEFTWALL + (currentAnimation->targetWallIndex[1] * (ROOMSIZE+1));
+                worldX = LEFTWALL + ((currentAnimation->targetWallIndex[1] + 1) * (ROOMSIZE+1));
                 worldZ = BOTTOMWALL + (currentAnimation->targetWallIndex[0] * (ROOMSIZE+1)) + currentAnimation->animationState;
                 for(i = 1; i <= WALL_HEIGHT; i++){
                     world[worldX][FLOORHEIGHT+i][worldZ] = 6;
@@ -403,7 +403,7 @@ void processAllAnimations(){
             }
             else if(z_walls[currentAnimation->targetWallIndex[0]][currentAnimation->targetWallIndex[1]].state == OPENING){
                 /*Remove the cubes*/
-                worldX = LEFTWALL + (currentAnimation->targetWallIndex[1] * (ROOMSIZE+1));
+                worldX = LEFTWALL + ((currentAnimation->targetWallIndex[1] + 1) * (ROOMSIZE+1));
                 worldZ = BOTTOMWALL + (currentAnimation->targetWallIndex[0] * (ROOMSIZE+1)) + currentAnimation->animationState;
                 for(i = 1; i <= WALL_HEIGHT; i++){
                     world[worldX][FLOORHEIGHT+i][worldZ] = 0;
@@ -450,4 +450,37 @@ void deleteFromAnimationQueue(AnimationList * toDelete){
     }
 
     free(toDelete);
+}
+
+
+void printXWalls(){
+    int i, j;
+
+    for(i = 0; i < GRIDSIZE-1; i++){
+        for(j = 0; j < GRIDSIZE; j++){
+            if(x_walls[i][j].state == CLOSED){
+                printf("-");
+            }
+            else{
+                printf("O");
+            }
+        }
+        printf("\n");
+    }
+}
+
+void printZWalls(){
+    int i, j;
+
+    for(i = 0; i < GRIDSIZE; i++){
+        for(j = 0; j < GRIDSIZE-1; j++){
+            if(z_walls[i][j].state == CLOSED){
+                printf("|");
+            }
+            else{
+                printf("O");
+            }
+        }
+        printf("\n");
+    }
 }

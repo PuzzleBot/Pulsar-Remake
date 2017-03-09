@@ -63,7 +63,7 @@ void drawSmallMinimap(){
     vpY = -vpY;
     vpZ = -vpZ;
 
-    playerSquareLeft = UI_MAP_LEFT + (vpX - LEFTWALL)*UI_SQUARE_DIM_HORIZ;
+    playerSquareLeft = UI_MAP_RIGHT - (vpX - LEFTWALL + 1)*UI_SQUARE_DIM_HORIZ;
     playerSquareBottom = UI_MAP_BOTTOM + (vpZ - BOTTOMWALL)*UI_SQUARE_DIM_VERT;
 
     set2Dcolour(playerColour);
@@ -76,7 +76,7 @@ void drawSmallMinimap(){
     /*Draw projectiles*/
     for(i = 0; i < MAX_BULLETS; i++){
         if(bulletArray[i].existsInWorld == 1){
-            bulletSquareLeft = UI_MAP_LEFT + (bulletArray[i].x_pos - LEFTWALL)*UI_SQUARE_DIM_HORIZ;
+            bulletSquareLeft = UI_MAP_RIGHT - (bulletArray[i].x_pos - LEFTWALL + 1)*UI_SQUARE_DIM_HORIZ;
             bulletSquareBottom = UI_MAP_BOTTOM + (bulletArray[i].z_pos - BOTTOMWALL)*UI_SQUARE_DIM_VERT;
 
             set2Dcolour(bulletColour);
@@ -158,8 +158,8 @@ void drawSmallMinimap(){
                             break;
                     }
 
-                    /*Draw from left to right, bottom to top*/
-                    currentSquareLeft = UI_MAP_LEFT + (i - LEFTWALL)*UI_SQUARE_DIM_HORIZ;
+                    /*Draw from right to left, bottom to top*/
+                    currentSquareLeft = UI_MAP_RIGHT - (i - LEFTWALL + 1)*UI_SQUARE_DIM_HORIZ;
                     currentSquareBottom = UI_MAP_BOTTOM + (k - BOTTOMWALL)*UI_SQUARE_DIM_VERT;
 
                     draw2Dbox((currentSquareLeft),
@@ -205,7 +205,7 @@ void drawFullMap(){
     vpY = -vpY;
     vpZ = -vpZ;
 
-    playerSquareLeft = UI_FULLMAP_LEFT + (vpX - LEFTWALL)*UI_FULLSQUARE_DIM_HORIZ;
+    playerSquareLeft = UI_FULLMAP_RIGHT - (vpX - LEFTWALL + 1)*UI_FULLSQUARE_DIM_HORIZ;
     playerSquareBottom = UI_FULLMAP_BOTTOM + (vpZ - BOTTOMWALL)*UI_FULLSQUARE_DIM_VERT;
 
     set2Dcolour(playerColour);
@@ -218,7 +218,7 @@ void drawFullMap(){
     /*Draw projectiles*/
     for(i = 0; i < MAX_BULLETS; i++){
         if(bulletArray[i].existsInWorld == 1){
-            bulletSquareLeft = UI_FULLMAP_LEFT + (bulletArray[i].x_pos - LEFTWALL)*UI_FULLSQUARE_DIM_HORIZ;
+            bulletSquareLeft = UI_FULLMAP_RIGHT - (bulletArray[i].x_pos - LEFTWALL + 1)*UI_FULLSQUARE_DIM_HORIZ;
             bulletSquareBottom = UI_FULLMAP_BOTTOM + (bulletArray[i].z_pos - BOTTOMWALL)*UI_FULLSQUARE_DIM_VERT;
 
             set2Dcolour(bulletColour);
@@ -299,8 +299,8 @@ void drawFullMap(){
                             break;
                     }
 
-                    /*Draw from left to right, bottom to top*/
-                    currentSquareLeft = UI_FULLMAP_LEFT + (i - LEFTWALL)*UI_FULLSQUARE_DIM_HORIZ;
+                    /*Draw from right to left, bottom to top*/
+                    currentSquareLeft = UI_FULLMAP_RIGHT - (i - LEFTWALL + 1)*UI_FULLSQUARE_DIM_HORIZ;
                     currentSquareBottom = UI_FULLMAP_BOTTOM + (k - BOTTOMWALL)*UI_FULLSQUARE_DIM_VERT;
 
                     draw2Dbox((currentSquareLeft),

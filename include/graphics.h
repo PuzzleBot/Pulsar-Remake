@@ -152,16 +152,26 @@ typedef struct MobChain{
     double y_pos;
     double z_pos;
 
-    double x_destination;
-    double y_destination;
-    double z_destination;
+    int x_destination;
+    int y_destination;
+    int z_destination;
 
     int currentAnimationFrame;
     MobState currentAiState;
+    int currentHighGridCell[2];
 
     struct MobChain * next;
     struct MobChain * prev;
 } Mob;
+
+
+/*Higher level grid - for managing pathfinding and waypoints*/
+typedef enum{HIGHGRID_WALL, HIGHGRID_PILLAR, HIGHGRID_CELL} HighGridType;
+
+typedef struct{
+    HighGridType type;
+    Wall * correspondingWall;
+} HighGrid;
 
 
 /* Wall functions */
@@ -191,6 +201,9 @@ void processAllAnimations();
 /*Removes an animation from the animation queue*/
 void deleteFromAnimationQueue(AnimationList * toDelete);
 
+void printXWalls();
+void printZWalls();
+
 
 
 /*Draws a minimap in the top-right corner*/
@@ -219,3 +232,8 @@ Boolean checkMobCollision(double destinationX, double destinationY, double desti
 void animateSingleMob(Mob * mob);
 void animateAllMobs();
 void worldMobInit();
+
+/*Waypoint grid functions*/
+void getCoorespondingHighGridIndex(int * xIndex, int * yIndex, int xBlock, int zBlock);
+void initWaypointGrid();
+void printWaypointGrid();
