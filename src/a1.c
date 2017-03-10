@@ -90,7 +90,7 @@ AnimationList * animationQueue = NULL;
 
 
 /*Array of empty cells, walls between them, and pillars - basically a higher level grid of the play area*/
-extern HighGrid waypointGrid[(GRIDSIZE * 2)][(GRIDSIZE * 2)];
+extern HighGrid waypointGrid[(GRIDSIZE * 2) + 1][(GRIDSIZE * 2) + 1];
 
 
 /*Linked list of mobs - we're iterating over all of the live ones anyway to update, so why not a list?*/
@@ -476,6 +476,7 @@ int main(int argc, char** argv)
         }
         initializeWalls();
         initWaypointGrid();
+        initializeBulletArray();
         worldMobInit();
         printWaypointGrid();
 

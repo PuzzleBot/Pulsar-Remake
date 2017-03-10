@@ -89,10 +89,12 @@ GLubyte  world[WORLDX][WORLDY][WORLDZ];
 
 /*Limit the number of player bullets on the screen at once*/
 #define MAX_BULLETS 12
+#define BULLET_ARRAY_SIZE MAX_BULLETS + MOB_SPAWN
 #define BULLETLIFE 1500
 
 #define MOB_BULLET_ARRAY_START MAX_BULLETS
 #define MOB_MOVEMENT_SPEED 0.80
+#define MOB_SPAWN 1
 
 
 typedef enum{FALSE, TRUE} Boolean;
@@ -154,16 +156,28 @@ typedef struct MobChain{
     double y_pos;
     double z_pos;
 
-    int x_destinationCell;
-    int y_destinationCell;
+    int x_destinationBlock;
+    int y_destinationBlock;
+    int z_destinationBlock;
 
     int currentAnimationFrame;
     MobState currentAiState;
     int currentHighGridCell[2];
 
+    Bullet * mobBullet;
+    int bulletArrayId;
+
     struct MobChain * next;
     struct MobChain * prev;
 } Mob;
+
+typedef struct BlockChain{
+    int x;
+    int y;
+    int z;
+
+    struct BlockChain * next;
+} BlockList;
 
 
 /*Higher level grid - for managing pathfinding and waypoints*/
@@ -217,6 +231,8 @@ void drawFullMap();
 /*Fires a bullet from the player based on their view*/
 void fireBulletFromPlayer();
 
+void fireBulletFromMobToPlayer(Mob * mob, double vpX, double vpY, double vpZ);
+
 void moveAllBullets();
 
 void bulletCollision(int bulletId);
@@ -243,3 +259,9 @@ void worldMobInit();
 void getCorrespondingHighGridIndex(int * xIndex, int * yIndex, int xBlock, int zBlock);
 void initWaypointGrid();
 void printWaypointGrid();
+
+/*Line of sight functions*/
+BlockList * getAllBlocksOnLine(BlockList * listofBlocks, double startX, double startY, double startZ, double endX, double endY, double endZ);
+BlockList * addToBlockList(BlockList * list, int newBlockX, int newBlockY, int newBlockZ);
+void deleteBlockList(BlockList * list);
+Boolean detectWallInPath(BlockList * blocksInPath);

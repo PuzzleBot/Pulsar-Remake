@@ -14,7 +14,7 @@ extern int screenWidth, screenHeight;
 /* flag indicates if map is to be printed */
 extern int displayMap;
 
-extern Bullet bulletArray[MAX_BULLETS];
+extern Bullet bulletArray[BULLET_ARRAY_SIZE];
 
 /*Wall and floor colours*/
 GLfloat blue[] = {0.0, 0.0, 1.0, 0.5};
@@ -74,7 +74,7 @@ void drawSmallMinimap(){
 
 
     /*Draw projectiles*/
-    for(i = 0; i < MAX_BULLETS; i++){
+    for(i = 0; i < BULLET_ARRAY_SIZE; i++){
         if(bulletArray[i].existsInWorld == 1){
             bulletSquareLeft = UI_MAP_RIGHT - (bulletArray[i].x_pos - LEFTWALL + 1)*UI_SQUARE_DIM_HORIZ;
             bulletSquareBottom = UI_MAP_BOTTOM + (bulletArray[i].z_pos - BOTTOMWALL)*UI_SQUARE_DIM_VERT;
@@ -216,7 +216,7 @@ void drawFullMap(){
 
 
     /*Draw projectiles*/
-    for(i = 0; i < MAX_BULLETS; i++){
+    for(i = 0; i < BULLET_ARRAY_SIZE; i++){
         if(bulletArray[i].existsInWorld == 1){
             bulletSquareLeft = UI_FULLMAP_RIGHT - (bulletArray[i].x_pos - LEFTWALL + 1)*UI_FULLSQUARE_DIM_HORIZ;
             bulletSquareBottom = UI_FULLMAP_BOTTOM + (bulletArray[i].z_pos - BOTTOMWALL)*UI_FULLSQUARE_DIM_VERT;

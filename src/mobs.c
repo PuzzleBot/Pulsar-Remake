@@ -1,7 +1,10 @@
 #include "graphics.h"
 
-extern HighGrid waypointGrid[(GRIDSIZE * 2)][(GRIDSIZE * 2)];
+extern HighGrid waypointGrid[(GRIDSIZE * 2) + 1][(GRIDSIZE * 2) + 1];
+extern Bullet bulletArray[BULLET_ARRAY_SIZE];
 Mob * mobList;
+
+extern void getViewPosition(float *, float *, float *);
 
 Mob * createNewMob(MobType type, double x, double y, double z){
     int i, j, k;
@@ -156,6 +159,9 @@ Mob * generateRandomMobs(int count){
 
         generateValidMobPosition(&mobX, &mobY, &mobZ);
         newMobList = mobAddToFront(newMobList, createNewMob(chosenType, mobX, mobY, mobZ));
+
+        newMobList->mobBullet = &bulletArray[MOB_BULLET_ARRAY_START + i];
+        newMobList->bulletArrayId = MOB_BULLET_ARRAY_START + i;
     }
 
     return(newMobList);
@@ -321,17 +327,33 @@ void animateAllMobs(){
 }
 
 void processMobAI(Mob * mob){
+    BlockList * blocksInPath = NULL;
     int mobHighGridCellX;
     int mobHighGridCellY;
-    int aheadHighGridCellX;
-    int aheadHighGridCellY;
+
+    float playerX, playerY, playerZ;
 
     int numberOfOpenPaths = 0;
     Direction openDirections[4];
     int cellsToTraverse = 1;
 
-    /*Detect line of sight, change ai state accordingly*/
+    /*Detect line of sight, possibly shoot a projectile, change ai state accordingly*/
+    getViewPosition(&playerX, &playerY, &playerZ);
+    playerX = -playerX;
+    playerY = -playerY;
+    playerZ = -playerZ;
 
+    blocksInPath = getAllBlocksOnLine(blocksInPath, mob->x_pos, mob->y_pos, mob->z_pos, (double)playerX, (double)playerY, (double)playerZ);
+
+    if(detectWallInPath(blocksInPath) == FALSE){
+        /*Line of sight from mob to player*/
+        fireBulletFromMobToPlayer(mob, playerX, playerY, playerZ);
+    }
+
+    deleteBlockList(blocksInPath);
+    blocksInPath = NULL;
+
+    return;
 
     /*Move depending on state*/
     if(mob->currentAiState == ROAMING){
@@ -339,32 +361,25 @@ void processMobAI(Mob * mob){
         if((fabs(mob->x_velocity) <= 0.01) && (fabs(mob->y_velocity) <= 0.01) && (fabs(mob->z_velocity) <= 0.01)){
             /*Look for a surrounding cell that is not blocked by a wall*/
             getCorrespondingHighGridIndex(&mobHighGridCellX, &mobHighGridCellY, (int)mob->x_pos, (int)mob->z_pos);
-            printf(" (stopped) %d\n", waypointGrid[mobHighGridCellY][mobHighGridCellX].type);
-            if((waypointGrid[mobHighGridCellY][mobHighGridCellX].type == HIGHGRID_WALL) || ((waypointGrid[mobHighGridCellY][mobHighGridCellX].type == HIGHGRID_PILLAR))){
-                printf("WALL! %d %d\n", mobHighGridCellY, mobHighGridCellX);
+            if(waypointGrid[mobHighGridCellY][mobHighGridCellX].type != HIGHGRID_CELL){
+                printf("WALL! %d - %d %d\n", waypointGrid[mobHighGridCellY][mobHighGridCellX].type, mobHighGridCellX, mobHighGridCellY);
                 /*Mob is in the path of a wall - move into an adjacent cell*/
-                if((mobHighGridCellX > 0) && (waypointGrid[mobHighGridCellY][mobHighGridCellX - 1].type == HIGHGRID_CELL)){
+                if(mobHighGridCellX % (ROOMSIZE+1) == 0){
+                    /*In the path of an x-alligned wall (horizontal) - move left/right*/
+                    printf("Horizontal\n");
                     openDirections[numberOfOpenPaths] = LEFT;
                     numberOfOpenPaths++;
-                    printf("Left\n");
-                }
-
-                if((mobHighGridCellX < (GRIDSIZE * 2) - 1) && (waypointGrid[mobHighGridCellY][mobHighGridCellX + 1].type == HIGHGRID_CELL)){
                     openDirections[numberOfOpenPaths] = RIGHT;
                     numberOfOpenPaths++;
-                    printf("Right\n");
                 }
 
-                if((mobHighGridCellY > 0) && (waypointGrid[mobHighGridCellY - 1][mobHighGridCellX].type == HIGHGRID_CELL)){
-                    openDirections[numberOfOpenPaths] = DOWN;
-                    numberOfOpenPaths++;
-                    printf("Down\n");
-                }
-
-                if((mobHighGridCellY < (GRIDSIZE * 2) - 1) && (waypointGrid[mobHighGridCellY + 1][mobHighGridCellX].type == HIGHGRID_CELL)){
+                if(mobHighGridCellY % (ROOMSIZE+1) == 0){
+                    /*In the path of an z-alligned wall (vertical) - move up/down*/
+                    printf("Vertical\n");
                     openDirections[numberOfOpenPaths] = UP;
                     numberOfOpenPaths++;
-                    printf("Up\n");
+                    openDirections[numberOfOpenPaths] = DOWN;
+                    numberOfOpenPaths++;
                 }
 
                 cellsToTraverse = 1;
@@ -377,7 +392,7 @@ void processMobAI(Mob * mob){
                 }
 
                 /*Right path*/
-                if((mobHighGridCellX < (GRIDSIZE * 2) - 1) && (waypointGrid[mobHighGridCellY][mobHighGridCellX + 1].correspondingWall != NULL) && (waypointGrid[mobHighGridCellY][mobHighGridCellX + 1].correspondingWall->state == OPEN)){
+                if((mobHighGridCellX < (GRIDSIZE * 2) + 1) && (waypointGrid[mobHighGridCellY][mobHighGridCellX + 1].correspondingWall != NULL) && (waypointGrid[mobHighGridCellY][mobHighGridCellX + 1].correspondingWall->state == OPEN)){
                     openDirections[numberOfOpenPaths] = RIGHT;
                     numberOfOpenPaths++;
                 }
@@ -389,7 +404,7 @@ void processMobAI(Mob * mob){
                 }
 
                 /*Upper path*/
-                if((mobHighGridCellY < (GRIDSIZE * 2) - 1) && (waypointGrid[mobHighGridCellY + 1][mobHighGridCellX].correspondingWall != NULL) && (waypointGrid[mobHighGridCellY + 1][mobHighGridCellX].correspondingWall->state == OPEN)){
+                if((mobHighGridCellY < (GRIDSIZE * 2) + 1) && (waypointGrid[mobHighGridCellY + 1][mobHighGridCellX].correspondingWall != NULL) && (waypointGrid[mobHighGridCellY + 1][mobHighGridCellX].correspondingWall->state == OPEN)){
                     openDirections[numberOfOpenPaths] = UP;
                     numberOfOpenPaths++;
                 }
@@ -405,38 +420,42 @@ void processMobAI(Mob * mob){
                         mob->y_velocity = 0;
                         mob->z_velocity = 0;
 
-                        mob->x_destinationCell = mobHighGridCellX - cellsToTraverse;
-                        mob->y_destinationCell = mobHighGridCellY;
+                        mob->x_destinationBlock = (int)mob->x_pos - (((int)mob->x_pos - LEFTWALL) % (ROOMSIZE+1)) - (ROOMSIZE/2);
+                        mob->y_destinationBlock = (int)mob->y_pos;
+                        mob->z_destinationBlock = (int)mob->z_pos;
                         break;
                     case RIGHT:
                         mob->x_velocity = MOB_MOVEMENT_SPEED;
                         mob->y_velocity = 0;
                         mob->z_velocity = 0;
 
-                        mob->x_destinationCell = mobHighGridCellX + cellsToTraverse;
-                        mob->y_destinationCell = mobHighGridCellY;
+                        mob->x_destinationBlock = (int)mob->x_pos + (ROOMSIZE+1 - (((int)mob->x_pos - LEFTWALL) % (ROOMSIZE+1))) + (ROOMSIZE/2);
+                        mob->y_destinationBlock = (int)mob->y_pos;
+                        mob->z_destinationBlock = (int)mob->z_pos;
                         break;
                     case UP:
                         mob->x_velocity = 0;
                         mob->y_velocity = 0;
                         mob->z_velocity = MOB_MOVEMENT_SPEED;
 
-                        mob->x_destinationCell = mobHighGridCellX;
-                        mob->y_destinationCell = mobHighGridCellY + cellsToTraverse;
+                        mob->x_destinationBlock = (int)mob->x_pos;
+                        mob->y_destinationBlock = (int)mob->y_pos;
+                        mob->z_destinationBlock = (int)mob->z_pos - (((int)mob->z_pos - BOTTOMWALL) % (ROOMSIZE+1)) - (ROOMSIZE/2);
                         break;
                     case DOWN:
                         mob->x_velocity = 0;
                         mob->y_velocity = 0;
                         mob->z_velocity = -MOB_MOVEMENT_SPEED;
 
-                        mob->x_destinationCell = mobHighGridCellX;
-                        mob->y_destinationCell = mobHighGridCellY - cellsToTraverse;
+                        mob->x_destinationBlock = (int)mob->x_pos;
+                        mob->y_destinationBlock = (int)mob->y_pos;
+                        mob->z_destinationBlock = (int)mob->z_pos + (ROOMSIZE+1 - (((int)mob->z_pos - BOTTOMWALL) % (ROOMSIZE+1))) + (ROOMSIZE/2);
                         break;
                     default:
                         printf("Error\n");
                         break;
                 }
-                printf("Moving to cell: %d %d\n", mob->x_destinationCell, mob->y_destinationCell);
+                printf("Moving to: %d %d\n", mob->x_destinationBlock, mob->y_destinationBlock);
             }
             else{
                 stopMob(mob);
@@ -448,77 +467,47 @@ void processMobAI(Mob * mob){
 
             if(mob->x_velocity <= 0){
                 /*Leftward movement - left wall check*/
-                /*Is the mob at the cell it wanted to travel to?*/
-                getCorrespondingHighGridIndex(&mobHighGridCellX, &mobHighGridCellY, (int)mob->x_pos, (int)mob->z_pos);
-                printf(" %d\n", waypointGrid[mobHighGridCellY][mobHighGridCellX].type);
-                if((mobHighGridCellX == mob->x_destinationCell) && (mobHighGridCellY == mob->y_destinationCell)){
-                    /*Destination cell reached - continue moving a bit to get more into the cell*/
-                    if(((int)mob->x_pos - LEFTWALL) % (ROOMSIZE+1) <= ((ROOMSIZE+1) / 2)){
-                        stopMob(mob);
-                    }
+                /*Is the mob at the x-position it wanted to travel to?*/
+                if((int)mob->x_pos < mob->x_destinationBlock){
+                    /*Destination reached*/
+                    stopMob(mob);
                 }
                 else{
-                    /*Destination ahead - check for a newly closed wall blocking the path*/
-                    if((waypointGrid[mobHighGridCellY][mobHighGridCellX - 1].correspondingWall != NULL) && (waypointGrid[mobHighGridCellY][mobHighGridCellX - 1].correspondingWall->state == CLOSED)){
-                        stopMob(mob);
-                    }
+                    /*Destination ahead - check for a wall blocking the path*/
+
                 }
             }
             else if(mob->x_velocity > 0){
                 /*Rightward movement - right wall check*/
                 /*Is the mob at the cell it wanted to travel to?*/
-                getCorrespondingHighGridIndex(&mobHighGridCellX, &mobHighGridCellY, (int)mob->x_pos, (int)mob->z_pos);
-                printf(" %d\n", waypointGrid[mobHighGridCellY][mobHighGridCellX].type);
-
-                if((mobHighGridCellX == mob->x_destinationCell) && (mobHighGridCellY == mob->y_destinationCell)){
-                    /*Destination cell reached - continue moving a bit to get more into the cell*/
-                    if(((int)mob->x_pos - LEFTWALL) % (ROOMSIZE+1) >= ((ROOMSIZE+1) / 2)){
-                        stopMob(mob);
-                    }
+                if((int)mob->x_pos > mob->x_destinationBlock){
+                    /*Destination reached*/
+                    stopMob(mob);
                 }
                 else{
-                    /*Destination ahead - check for a newly closed wall blocking the path*/
-                    if((waypointGrid[mobHighGridCellY][mobHighGridCellX + 1].correspondingWall != NULL) && (waypointGrid[mobHighGridCellY][mobHighGridCellX + 1].correspondingWall->state == CLOSED)){
-                        stopMob(mob);
-                    }
+                    /*Destination ahead - check for a wall blocking the path*/
                 }
             }
             else if(mob->z_velocity <= 0){
                 /*Downward movement - south wall check*/
                 /*Is the mob at the cell it wanted to travel to?*/
-                getCorrespondingHighGridIndex(&mobHighGridCellX, &mobHighGridCellY, (int)mob->x_pos, (int)mob->z_pos);
-                printf(" %d\n", waypointGrid[mobHighGridCellY][mobHighGridCellX].type);
-
-                if((mobHighGridCellX == mob->x_destinationCell) && (mobHighGridCellY == mob->y_destinationCell)){
-                    /*Destination cell reached - continue moving a bit to get more into the cell*/
-                    if(((int)mob->z_pos - BOTTOMWALL) % (ROOMSIZE+1) <= ((ROOMSIZE+1) / 2)){
-                        stopMob(mob);
-                    }
+                if((int)mob->z_pos < mob->z_destinationBlock){
+                    /*Destination reached*/
+                    stopMob(mob);
                 }
                 else{
-                    /*Destination ahead - check for a newly closed wall blocking the path*/
-                    if((waypointGrid[mobHighGridCellY - 1][mobHighGridCellX].correspondingWall != NULL) && (waypointGrid[mobHighGridCellY - 1][mobHighGridCellX].correspondingWall->state == CLOSED)){
-                        stopMob(mob);
-                    }
+                    /*Destination ahead - check for a wall blocking the path*/
                 }
             }
             else if(mob->z_velocity > 0){
                 /*Upward movement - north wall check*/
                 /*Is the mob at the cell it wanted to travel to?*/
-                getCorrespondingHighGridIndex(&mobHighGridCellX, &mobHighGridCellY, (int)mob->x_pos, (int)mob->z_pos);
-                printf(" %d\n", waypointGrid[mobHighGridCellY][mobHighGridCellX].type);
-
-                if((mobHighGridCellX == mob->x_destinationCell) && (mobHighGridCellY == mob->y_destinationCell)){
-                    /*Destination cell reached - continue moving a bit to get more into the cell*/
-                    if(((int)mob->z_pos - BOTTOMWALL) % (ROOMSIZE+1) >= ((ROOMSIZE+1) / 2)){
-                        stopMob(mob);
-                    }
+                if((int)mob->z_pos > mob->z_destinationBlock){
+                    /*Destination reached*/
+                    stopMob(mob);
                 }
                 else{
-                    /*Destination ahead - check for a newly closed wall blocking the path*/
-                    if((waypointGrid[mobHighGridCellY + 1][mobHighGridCellX].correspondingWall != NULL) && (waypointGrid[mobHighGridCellY + 1][mobHighGridCellX].correspondingWall->state == CLOSED)){
-                        stopMob(mob);
-                    }
+                    /*Destination ahead - check for a wall blocking the path*/
                 }
             }
         }
@@ -529,9 +518,7 @@ void processMobAI(Mob * mob){
 
     /*Velocity not zero - move the mob*/
     //printf("Velocity: %.2f %.2f %.2f\n", fabs(mob->x_velocity), fabs(mob->y_velocity), fabs(mob->z_velocity));
-    if((fabs(mob->x_velocity) >= 0.01) || (fabs(mob->y_velocity) >= 0.01) || (fabs(mob->z_velocity) >= 0.01)){
-        moveMob(mob);
-    }
+    moveMob(mob);
 }
 
 Boolean moveMob(Mob * mob){
@@ -557,33 +544,28 @@ Boolean moveMob(Mob * mob){
             return TRUE;
         }
         else{
-            /*Collision - don't move if it's a wall, sidestep if it's another AI*/
-            if((collidedBlock == 2) || (collidedBlock == 6)){
-                stopMob(mob);
+            /*Sidestep by rotating current velocity by 90 degrees counterclockwise
+              to try to get around the obstacle*/
+            printf("Attempting to sidestep\n");
+            newX_pos = mob->x_pos + mob->z_velocity;
+            newZ_pos = mob->z_pos + mob->x_velocity;
+            if(checkMobCollision(newX_pos, newY_pos, newZ_pos, mob) == 0){
+                clearMobSpace((int)mob->x_pos, (int)mob->y_pos, (int)mob->z_pos);
+                mob->x_pos = newX_pos;
+                mob->z_pos = newZ_pos;
             }
             else{
-                /*Sidestep by rotating current velocity by 90 degrees counterclockwise*/
-                printf("Attempting to sidestep\n");
-                newX_pos = mob->x_pos + mob->z_velocity;
-                newZ_pos = mob->z_pos + mob->x_velocity;
+                /*If the mob can't sidestep that way, try the other way*/
+                newX_pos = -newX_pos;
+                newZ_pos = -newZ_pos;
                 if(checkMobCollision(newX_pos, newY_pos, newZ_pos, mob) == 0){
                     clearMobSpace((int)mob->x_pos, (int)mob->y_pos, (int)mob->z_pos);
                     mob->x_pos = newX_pos;
                     mob->z_pos = newZ_pos;
                 }
                 else{
-                    /*If the mob can't sidestep that way, try the other way*/
-                    newX_pos = -newX_pos;
-                    newZ_pos = -newZ_pos;
-                    if(checkMobCollision(newX_pos, newY_pos, newZ_pos, mob) == 0){
-                        clearMobSpace((int)mob->x_pos, (int)mob->y_pos, (int)mob->z_pos);
-                        mob->x_pos = newX_pos;
-                        mob->z_pos = newZ_pos;
-                    }
-                    else{
-                        /*Can't sidestep - don't do anything, wait for the other AI to hopefully move*/
-                        stopMob(mob);
-                    }
+                    /*Can't sidestep - don't do anything, wait for the other AI to hopefully move*/
+                    stopMob(mob);
                 }
             }
             return FALSE;
@@ -598,5 +580,5 @@ void stopMob(Mob * mob){
 }
 
 void worldMobInit(){
-    mobList = generateRandomMobs(1);
+    mobList = generateRandomMobs(MOB_SPAWN);
 }
