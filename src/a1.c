@@ -85,6 +85,7 @@ extern Wall z_walls[GRIDSIZE][GRIDSIZE-1];
 extern Wall x_walls[GRIDSIZE-1][GRIDSIZE];
 int wallTimer = 0;
 int wallAnimationTimer = 0;
+int wallCount = STARTING_WALLS;
 AnimationList * animationQueue = NULL;
 
 
@@ -344,9 +345,19 @@ void update() {
                 wallTimer = 0;
 
                 /*Open/close walls at random*/
-                /*toggleRandomWall();*/
-                toggleTwoWalls();
-                printWaypointGrid();
+                toggleRandomWall();
+                toggleRandomWall();
+                toggleRandomWall();
+                toggleRandomWall();
+                //toggleTwoWalls();
+                //printWaypointGrid();
+            }
+
+            /*AI movement*/
+            mobTimer++;
+            if(mobTimer >= FPS_CAP/15){
+                mobTimer = 0;
+                animateAllMobs(mobList);
             }
 
             wallAnimationTimer++;
@@ -357,14 +368,6 @@ void update() {
 
             /*Bullet movement*/
             moveAllBullets();
-
-
-            /*AI movement*/
-            mobTimer++;
-            if(mobTimer >= FPS_CAP/15){
-                mobTimer = 0;
-                animateAllMobs(mobList);
-            }
 
             glutPostRedisplay();
             gettimeofday(&previousUpdate, NULL);
@@ -474,6 +477,7 @@ int main(int argc, char** argv)
         initializeWalls();
         initWaypointGrid();
         worldMobInit();
+        printWaypointGrid();
 
         setViewPosition(-(LEFTWALL+2), -(FLOORHEIGHT+2), -(BOTTOMWALL+2));
         glutWarpPointer(512, 384);

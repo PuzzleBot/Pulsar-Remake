@@ -92,6 +92,8 @@ GLubyte  world[WORLDX][WORLDY][WORLDZ];
 #define BULLETLIFE 1500
 
 #define MOB_BULLET_ARRAY_START MAX_BULLETS
+#define MOB_MOVEMENT_SPEED 0.80
+
 
 typedef enum{FALSE, TRUE} Boolean;
 
@@ -152,9 +154,8 @@ typedef struct MobChain{
     double y_pos;
     double z_pos;
 
-    int x_destination;
-    int y_destination;
-    int z_destination;
+    int x_destinationCell;
+    int y_destinationCell;
 
     int currentAnimationFrame;
     MobState currentAiState;
@@ -167,6 +168,7 @@ typedef struct MobChain{
 
 /*Higher level grid - for managing pathfinding and waypoints*/
 typedef enum{HIGHGRID_WALL, HIGHGRID_PILLAR, HIGHGRID_CELL} HighGridType;
+typedef enum{LEFT, RIGHT, UP, DOWN} Direction;
 
 typedef struct{
     HighGridType type;
@@ -228,12 +230,16 @@ void generateValidMobPosition(int * x, int * y, int * z);
 Mob * mobAddToFront(Mob * mobList, Mob * newMob);
 Mob * mobDeleteFromFront(Mob * mobList);
 Mob * generateRandomMobs(int count);
-Boolean checkMobCollision(double destinationX, double destinationY, double destinationZ, Mob * mob);
+int checkMobCollision(double destinationX, double destinationY, double destinationZ, Mob * mob);
+void clearMobSpace(int coreX, int coreY, int coreZ);
 void animateSingleMob(Mob * mob);
 void animateAllMobs();
+void processMobAI(Mob * mob);
+Boolean moveMob(Mob * mob);
+void stopMob(Mob * mob);
 void worldMobInit();
 
 /*Waypoint grid functions*/
-void getCoorespondingHighGridIndex(int * xIndex, int * yIndex, int xBlock, int zBlock);
+void getCorrespondingHighGridIndex(int * xIndex, int * yIndex, int xBlock, int zBlock);
 void initWaypointGrid();
 void printWaypointGrid();

@@ -253,7 +253,15 @@ void addToAnimationQueue(WallState animationType, int isXwall, int row, int col)
         newAnimation->targetWallIndex[0] = row;
         newAnimation->targetWallIndex[1] = col;
         newAnimation->isXwall = isXwall;
-        newAnimation->animationState = ROOMSIZE;
+
+        if(animationType == CLOSING){
+            newAnimation->animationState = ROOMSIZE;
+        }
+        else{
+            newAnimation->animationState = 1;
+        }
+
+
         newAnimation->next = NULL;
         newAnimation->prev = NULL;
 
@@ -290,11 +298,13 @@ void processAllAnimations(){
     AnimationList * animBuffer;
     int worldX;
     int worldZ;
-    int animationComplete;
+    int animationComplete = 0;
 
     float viewpointX;
     float viewpointY;
     float viewpointZ;
+
+    Boolean mobInWall = FALSE;
 
     float roundedAmount;
     float roundedToValue;
@@ -317,34 +327,56 @@ void processAllAnimations(){
                 worldX = LEFTWALL + (currentAnimation->targetWallIndex[1] * (ROOMSIZE+1)) + currentAnimation->animationState;
                 worldZ = BOTTOMWALL + ((currentAnimation->targetWallIndex[0] + 1) * (ROOMSIZE+1));
 
+                mobInWall = FALSE;
                 for(i = 1; i <= WALL_HEIGHT; i++){
-                    world[worldX][FLOORHEIGHT+i][worldZ] = 6;
+                    /*If there is a mob in the way, the wall "bounces back" (opens again)*/
+                    if(world[worldX][FLOORHEIGHT+i][worldZ] != 0){
+                        mobInWall = TRUE;
+                    }
                 }
 
-                /*If the player is inside the wall, push them out*/
-                if(((int)floor(viewpointX) == worldX) && ((int)floor(viewpointZ) == worldZ) &&
-                   (((int)floor(viewpointY) == FLOORHEIGHT+1) || ((int)floor(viewpointY) == FLOORHEIGHT+2))){
+                /*Nothing blocking the wall? Continue closing it*/
+                if(mobInWall == FALSE){
+                    for(i = 1; i <= WALL_HEIGHT; i++){
+                        world[worldX][FLOORHEIGHT+i][worldZ] = 6;
+                    }
 
-                    roundedToValue = round(viewpointZ);
-                    roundedAmount = roundedToValue - viewpointZ;
-                    /*Round z, then push them away a bit. The rounded value minus the original value
-                      determines which direction to push them.*/
-                    if(roundedAmount >= 0){
-                        /*Push up*/
-                        setViewPosition(-viewpointX, -viewpointY, -(roundedToValue + 0.5));
+                    /*If the player is inside the wall, push them out*/
+                    if(((int)floor(viewpointX) == worldX) && ((int)floor(viewpointZ) == worldZ) &&
+                       (((int)floor(viewpointY) == FLOORHEIGHT+1) || ((int)floor(viewpointY) == FLOORHEIGHT+2))){
+
+                        roundedToValue = round(viewpointZ);
+                        roundedAmount = roundedToValue - viewpointZ;
+                        /*Round z, then push them away a bit. The rounded value minus the original value
+                          determines which direction to push them.*/
+                        if(roundedAmount >= 0){
+                            /*Push up*/
+                            setViewPosition(-viewpointX, -viewpointY, -(roundedToValue + 0.5));
+                        }
+                        else{
+                            /*Push down*/
+                            setViewPosition(-viewpointX, -viewpointY, -(roundedToValue - 0.5));
+                        }
+                    }
+                    currentAnimation->animationState--;
+                    if(currentAnimation->animationState <= 0){
+                        x_walls[currentAnimation->targetWallIndex[0]][currentAnimation->targetWallIndex[1]].state = CLOSED;
+                        animationComplete = 1;
                     }
                     else{
-                        /*Push down*/
-                        setViewPosition(-viewpointX, -viewpointY, -(roundedToValue - 0.5));
+                        animationComplete = 0;
                     }
                 }
-                currentAnimation->animationState--;
-                if(currentAnimation->animationState <= 0){
-                    x_walls[currentAnimation->targetWallIndex[0]][currentAnimation->targetWallIndex[1]].state = CLOSED;
-                    animationComplete = 1;
-                }
                 else{
-                    animationComplete = 0;
+                    /*There's a mob blocking the wall - reverse the wall closing*/
+                    x_walls[currentAnimation->targetWallIndex[0]][currentAnimation->targetWallIndex[1]].state = OPENING;
+                    if(currentAnimation->animationState > ROOMSIZE){
+                        x_walls[currentAnimation->targetWallIndex[0]][currentAnimation->targetWallIndex[1]].state = OPEN;
+                        animationComplete = 1;
+                    }
+                    else{
+                        animationComplete = 0;
+                    }
                 }
 
             }
@@ -356,8 +388,8 @@ void processAllAnimations(){
                     world[worldX][FLOORHEIGHT+i][worldZ] = 0;
                 }
 
-                currentAnimation->animationState--;
-                if(currentAnimation->animationState <= 0){
+                currentAnimation->animationState++;
+                if(currentAnimation->animationState > ROOMSIZE){
                     x_walls[currentAnimation->targetWallIndex[0]][currentAnimation->targetWallIndex[1]].state = OPEN;
                     animationComplete = 1;
                 }
@@ -371,34 +403,58 @@ void processAllAnimations(){
                 /*Fill in the cubes*/
                 worldX = LEFTWALL + ((currentAnimation->targetWallIndex[1] + 1) * (ROOMSIZE+1));
                 worldZ = BOTTOMWALL + (currentAnimation->targetWallIndex[0] * (ROOMSIZE+1)) + currentAnimation->animationState;
+
+                mobInWall = FALSE;
                 for(i = 1; i <= WALL_HEIGHT; i++){
-                    world[worldX][FLOORHEIGHT+i][worldZ] = 6;
+                    /*If there is a mob in the way, the wall "bounces back" (opens again)*/
+                    if(world[worldX][FLOORHEIGHT+i][worldZ] != 0){
+                        mobInWall = TRUE;
+                    }
                 }
 
-                /*If the player is inside the wall, push them out*/
-                if(((int)floor(viewpointX) == worldX) && ((int)floor(viewpointZ) == worldZ) &&
-                   (((int)floor(viewpointY) == FLOORHEIGHT+1) || ((int)floor(viewpointY) == FLOORHEIGHT+2))){
+                /*Nothing blocking the wall? Continue closing it*/
+                if(mobInWall == FALSE){
+                    for(i = 1; i <= WALL_HEIGHT; i++){
+                        world[worldX][FLOORHEIGHT+i][worldZ] = 6;
+                    }
 
-                    roundedToValue = round(viewpointX);
-                    roundedAmount = roundedToValue - viewpointX;
-                    /*Round x, then push them away a bit. The rounded value minus the original value
-                     determines which direction to push them.*/
-                    if(roundedAmount >= 0){
-                        /*Push up*/
-                        setViewPosition(-(roundedToValue + 0.5), -viewpointY, -viewpointZ);
+                    /*If the player is inside the wall, push them out*/
+                    if(((int)floor(viewpointX) == worldX) && ((int)floor(viewpointZ) == worldZ) &&
+                       (((int)floor(viewpointY) == FLOORHEIGHT+1) || ((int)floor(viewpointY) == FLOORHEIGHT+2))){
+
+                        roundedToValue = round(viewpointX);
+                        roundedAmount = roundedToValue - viewpointX;
+                        /*Round x, then push them away a bit. The rounded value minus the original value
+                         determines which direction to push them.*/
+                        if(roundedAmount >= 0){
+                            /*Push up*/
+                            setViewPosition(-(roundedToValue + 0.5), -viewpointY, -viewpointZ);
+                        }
+                        else{
+                            /*Push down*/
+                            setViewPosition(-(roundedToValue - 0.5), -viewpointY, -viewpointZ);
+                        }
+                    }
+
+                    currentAnimation->animationState--;
+                    if(currentAnimation->animationState <= 0){
+                        z_walls[currentAnimation->targetWallIndex[0]][currentAnimation->targetWallIndex[1]].state = CLOSED;
+                        animationComplete = 1;
                     }
                     else{
-                        /*Push down*/
-                        setViewPosition(-(roundedToValue - 0.5), -viewpointY, -viewpointZ);
+                        animationComplete = 0;
                     }
                 }
-                currentAnimation->animationState--;
-                if(currentAnimation->animationState <= 0){
-                    z_walls[currentAnimation->targetWallIndex[0]][currentAnimation->targetWallIndex[1]].state = CLOSED;
-                    animationComplete = 1;
-                }
                 else{
-                    animationComplete = 0;
+                    /*There's a mob blocking the wall - reverse the wall closing*/
+                    z_walls[currentAnimation->targetWallIndex[0]][currentAnimation->targetWallIndex[1]].state = OPENING;
+                    if(currentAnimation->animationState > ROOMSIZE){
+                        z_walls[currentAnimation->targetWallIndex[0]][currentAnimation->targetWallIndex[1]].state = OPEN;
+                        animationComplete = 1;
+                    }
+                    else{
+                        animationComplete = 0;
+                    }
                 }
             }
             else if(z_walls[currentAnimation->targetWallIndex[0]][currentAnimation->targetWallIndex[1]].state == OPENING){
@@ -409,8 +465,8 @@ void processAllAnimations(){
                     world[worldX][FLOORHEIGHT+i][worldZ] = 0;
                 }
 
-                currentAnimation->animationState--;
-                if(currentAnimation->animationState <= 0){
+                currentAnimation->animationState++;
+                if(currentAnimation->animationState > ROOMSIZE){
                     z_walls[currentAnimation->targetWallIndex[0]][currentAnimation->targetWallIndex[1]].state = OPEN;
                     animationComplete = 1;
                 }
@@ -447,6 +503,12 @@ void deleteFromAnimationQueue(AnimationList * toDelete){
 
     if((toDelete->prev == NULL) && (toDelete->next == NULL)){
         animationQueue = NULL;
+    }
+    else if(toDelete->prev == NULL){
+        animationQueue = toDelete->next;
+    }
+    else if(toDelete->next == NULL){
+        animationQueue = toDelete->prev;
     }
 
     free(toDelete);
