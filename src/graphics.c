@@ -5,7 +5,7 @@
 
 #include "graphics.h"
 
-#define MOB_COUNT 20
+#define MOB_COUNT BULLET_ARRAY_SIZE + 20
 #define PLAYER_COUNT 10
 
 extern void update();
@@ -234,7 +234,7 @@ void setOldViewPosition(float x, float y, float z){
 void setViewPosition(float x, float y, float z) {
     /*CHANGED: added this line*/
     //setOldViewPosition(vpx, vpy, vpz);
-    
+
     vpx = x;
     vpy = y;
     vpz = z;
@@ -273,7 +273,7 @@ int addDisplayList(int x, int y, int z) {
         printf("cubes in the world. Set displayCount = 0 at some point.\n");
         exit(1);
     }
-    
+
     return(0);
 }
 
@@ -287,9 +287,9 @@ void init (void)
     GLfloat light_specular[] = { 0.5, 0.5, 0.5, 1.0 };
     GLfloat light_full_off[] = {0.0, 0.0, 0.0, 1.0};
     GLfloat light_full_on[] = {1.0, 1.0, 1.0, 1.0};
-    
+
     glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
-    
+
     /* if lighting is turned on then use ambient, diffuse and specular
      lights, otherwise use ambient lighting only */
     if (lighting == 1) {
@@ -304,21 +304,21 @@ void init (void)
         glLightfv (GL_LIGHT0, GL_SPECULAR, light_full_off);
     }
     glLightfv (GL_LIGHT0, GL_POSITION, lightPosition);
-    
+
     /* viewpoint light */
     glLightfv (GL_LIGHT1, GL_POSITION, viewpointLight);
     glLightfv (GL_LIGHT1, GL_AMBIENT, light_ambient);
     glLightfv (GL_LIGHT1, GL_DIFFUSE, light_diffuse);
     glLightfv (GL_LIGHT1, GL_SPECULAR, light_specular);
     glLightf(GL_LIGHT1, GL_LINEAR_ATTENUATION, 0.5);
-    
-    
+
+
     glEnable (GL_LIGHTING);
     glEnable (GL_LIGHT0);
     glEnable (GL_LIGHT1);
-    
+
     glEnable(GL_DEPTH_TEST);
-    
+
 }
 
 /* draw cube in world[i][j][k] */
@@ -332,18 +332,18 @@ void drawCube(int i, int j, int k) {
     static GLfloat orange[]   = {1.0, 0.64, 0.0, 1.0};
     static GLfloat white[] = {1.0, 1.0, 1.0, 1.0};
     static GLfloat black[] = {0.0, 0.0, 0.0, 1.0};
-    
+
     static GLfloat dblue[]  = {0.0, 0.0, 0.5, 1.0};
     static GLfloat dred[]   = {0.5, 0.0, 0.0, 1.0};
     static GLfloat dgreen[] = {0.0, 0.5, 0.0, 1.0};
     static GLfloat dyellow[]   = {0.5, 0.5, 0.0, 1.0};
     static GLfloat dpurple[]   = {0.5, 0.0, 0.5, 1.0};
     static GLfloat dorange[]   = {0.5, 0.32, 0.0, 1.0};
-    
-    
+
+
     /* select colour based on value in the world array */
     glMaterialfv(GL_FRONT, GL_SPECULAR, white);
-    
+
     if (world[i][j][k] == 1) {
         glMaterialfv(GL_FRONT, GL_AMBIENT, dgreen);
         glMaterialfv(GL_FRONT, GL_DIFFUSE, green);
@@ -374,7 +374,7 @@ void drawCube(int i, int j, int k) {
         glMaterialfv(GL_FRONT, GL_AMBIENT, dyellow);
         glMaterialfv(GL_FRONT, GL_DIFFUSE, yellow);
     }
-    
+
     glPushMatrix ();
     /* offset cubes by 0.5 so the centre of the */
     /* cube falls in the centre of the world array */
@@ -394,10 +394,10 @@ void display (void)
     GLfloat gray[] = {0.3, 0.3, 0.3, 1.0};
     GLfloat white[] = {1.0, 1.0, 1.0, 1.0};
     int i, j, k;
-    
+
     buildDisplayList();
     glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    
+
     /* position viewpoint based on mouse rotation and keyboard
      translation */
     glLoadIdentity();
@@ -408,32 +408,32 @@ void display (void)
     /* Gives the impression of a head on top of a body. */
     glTranslatef(vpx, vpy - 0.5, vpz);
     //   glTranslatef(vpx, vpy, vpz);
-    
-    
+
+
     /* set viewpoint light position */
     viewpointLight[0] = -vpx;
     viewpointLight[1] = -vpy;
     viewpointLight[2] = -vpz;
     glLightfv (GL_LIGHT1, GL_POSITION, viewpointLight);
-    
+
     /* draw surfaces as either smooth or flat shaded */
     if (smoothShading == 1)
         glShadeModel(GL_SMOOTH);
     else
         glShadeModel(GL_FLAT);
-    
+
     /* draw polygons as either solid or outlines */
     if (lineDrawing == 1)
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     else
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    
+
     /* give all objects the same shininess value and specular colour */
     glMaterialf(GL_FRONT, GL_SHININESS, 90.0);
-    
+
     /* set starting location of objects */
     glPushMatrix ();
-    
+
     /* make a blue sky cube */
     glShadeModel(GL_SMOOTH);
     /* turn off all reflection from sky so it is a solid colour */
@@ -449,7 +449,7 @@ void display (void)
     glShadeModel(GL_SMOOTH);
     /* turn off emision lighting, use only for sky */
     glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, black);
-    
+
     /* draw mobs in the world */
     for(i=0; i<MOB_COUNT; i++) {
         if (mobVisible[i] == 1) {
@@ -470,7 +470,7 @@ void display (void)
             glPopMatrix();
         }
     }
-    
+
     /* draw players in the world */
     for(i=0; i<PLAYER_COUNT; i++) {
         if (playerVisible[i] == 1) {
@@ -491,7 +491,7 @@ void display (void)
             glPopMatrix();
         }
     }
-    
+
     /* draw all cubes in the world array */
     if (displayAllCubes == 1) {
         /* draw all cubes */
@@ -507,16 +507,16 @@ void display (void)
     } else {
         /* draw only the cubes in the displayList */
         /* these should have been selected in the update function */
-        
+
         for(i=0; i<displayCount; i++) {
             drawCube(displayList[i][0],
                      displayList[i][1],
                      displayList[i][2]);
         }
     }
-    
-    
-    
+
+
+
     /* 2D drawing section used to create interface components */
     /* change to orthographic mode to display 2D images */
     glMatrixMode (GL_PROJECTION);
@@ -525,26 +525,26 @@ void display (void)
     gluOrtho2D(0, screenWidth, 0, screenHeight);
     glMatrixMode (GL_MODELVIEW);
     glLoadIdentity ();
-    
+
     /* turn on alpha blending for 2D */
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glShadeModel(GL_FLAT);
     glNormal3f(0.0, 0.0, -1.0);
-    
+
     /* call user's 2D drawing function */
     draw2D();
-    
+
     /* reset graphics for 3D drawing */
     glDisable(GL_BLEND);
-    
+
     glMatrixMode (GL_PROJECTION);
     glPopMatrix();
-    
+
     glMatrixMode (GL_MODELVIEW);
     glPopMatrix();
     /* end 2d display code */
-    
+
     glutSwapBuffers();
 }
 
@@ -561,7 +561,7 @@ void reshape(int w, int h)
     /* set global screen width and height */
     screenWidth = w;
     screenHeight = h;
-    
+
 }
 
 /* respond to keyboard events */
@@ -569,7 +569,7 @@ void keyboard(unsigned char key, int x, int y)
 {
     float rotx, roty;
     static int lighton = 1;
-    
+
     switch (key) {
         case 27:
         case 'q':
@@ -684,12 +684,12 @@ void loadTexture() {
     FILE *fp;
     int  i, j;
     int  red, green, blue;
-    
+
     if ((fp = fopen("image.txt", "r")) == 0) {
         printf("Error, failed to find the file named image.txt.\n");
         exit(0);
     }
-    
+
     for(i=0; i<64; i++) {
         for(j=0; j<64; j++) {
             fscanf(fp, "%d %d %d", &red, &green, &blue);
@@ -699,7 +699,7 @@ void loadTexture() {
             Image[i][j][3] = 255;
         }
     }
-    
+
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glGenTextures(1,textureID);
     glBindTexture(GL_TEXTURE_2D, textureID[0]);
@@ -712,7 +712,7 @@ void loadTexture() {
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     glEnable(GL_TEXTURE_GEN_S);
     glEnable(GL_TEXTURE_GEN_T);
-    
+
     fclose(fp);
 }
 
@@ -740,7 +740,7 @@ void graphicsInit(int *argc, char **argv) {
     /* set GL window information */
     glutInit(argc, argv);
     glutInitDisplayMode (GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
-    
+
     /* parse command line args */
     fullscreen = 0;
     for(i=1; i<*argc; i++) {
@@ -761,7 +761,7 @@ void graphicsInit(int *argc, char **argv) {
             exit(0);
         }
     }
-    
+
     if (fullscreen == 1) {
         glutGameModeString("1024x768:32@75");
         glutEnterGameMode();
@@ -769,12 +769,12 @@ void graphicsInit(int *argc, char **argv) {
         glutInitWindowSize (screenWidth, screenHeight);
         glutCreateWindow (argv[0]);
     }
-    
+
     init();
-    
+
     /* not used at the moment */
     //   loadTexture();
-    
+
     /* attach functions to GL events */
     glutReshapeFunc (reshape);
     glutDisplayFunc(display);
@@ -783,12 +783,12 @@ void graphicsInit(int *argc, char **argv) {
     glutMotionFunc(motion);
     glutMouseFunc(mouse);
     glutIdleFunc(update);
-    
-    
+
+
     /* initialize mob and player array to empty */
     initMobArray();
     initPlayerArray();
-    
+
     /* set the size of the sky */
     if (WORLDX > WORLDY)
         skySize = (float) WORLDX;
@@ -830,4 +830,3 @@ void  set2Dcolour(float colourv[]) {
     glMaterialfv(GL_FRONT, GL_EMISSION, colourv);
     glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, colourv);
 }
-

@@ -244,7 +244,7 @@ void toggleTwoWalls(){
 
 /*Adds a wall animation to the queue, to be executed on the subsequent updates until the animation
   has completed*/
-void addToAnimationQueue(WallState animationType, int isXwall, int row, int col){
+void addToAnimationQueue(WallState animationType, Boolean isXwall, int row, int col){
     AnimationList * newAnimation = NULL;
     AnimationList * backOfQueue;
 
@@ -280,7 +280,7 @@ void addToAnimationQueue(WallState animationType, int isXwall, int row, int col)
         }
 
         /*Initialize the animation state for the wall in the wall array*/
-        if(isXwall == 1){
+        if(isXwall == TRUE){
             x_walls[row][col].state = animationType;
         }
         else{

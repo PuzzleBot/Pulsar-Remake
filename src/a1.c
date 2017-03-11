@@ -345,11 +345,11 @@ void update() {
                 wallTimer = 0;
 
                 /*Open/close walls at random*/
+                /*toggleRandomWall();
                 toggleRandomWall();
                 toggleRandomWall();
                 toggleRandomWall();
-                toggleRandomWall();
-                //toggleTwoWalls();
+                //toggleTwoWalls();*/
                 //printWaypointGrid();
             }
 
@@ -478,7 +478,6 @@ int main(int argc, char** argv)
         initWaypointGrid();
         initializeBulletArray();
         worldMobInit();
-        printWaypointGrid();
 
         setViewPosition(-(LEFTWALL+2), -(FLOORHEIGHT+2), -(BOTTOMWALL+2));
         glutWarpPointer(512, 384);

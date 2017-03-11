@@ -77,7 +77,7 @@ GLubyte  world[WORLDX][WORLDY][WORLDZ];
 #define GRIDSIZE 6
 #define FLOORHEIGHT 10
 
-#define STARTING_WALLS 25
+#define STARTING_WALLS 0
 #define WALL_HEIGHT 5
 
 /*Collision and gravity*/
@@ -114,7 +114,7 @@ typedef struct anim_list{
     int targetWallIndex[2];
 
     /*Which array is it in - the x_walls array (1) or z_walls array (0)?*/
-    int isXwall;
+    Boolean isXwall;
 
     /*Current frame of animation - animation is completed when this reaches zero*/
     int animationState;
@@ -162,6 +162,7 @@ typedef struct MobChain{
 
     int currentAnimationFrame;
     MobState currentAiState;
+    Boolean dodgeStepToggle;
     int currentHighGridCell[2];
 
     Bullet * mobBullet;
@@ -208,7 +209,7 @@ void toggleRandomWall();
 void toggleTwoWalls();
 
 /*Queues an animation to be done on the next processing cycle*/
-void addToAnimationQueue(WallState animationType, int isXwall, int row, int col);
+void addToAnimationQueue(WallState animationType, Boolean isXwall, int row, int col);
 
 /*Perform one frame of each queued animation, removes the queued animation
   once it completes using the function below*/
@@ -253,6 +254,12 @@ void animateAllMobs();
 void processMobAI(Mob * mob);
 Boolean moveMob(Mob * mob);
 void stopMob(Mob * mob);
+
+void discardMobObjective(Mob * mob);
+Boolean mobHasObjective(Mob * mob);
+Boolean checkForPlayerWatching(Mob * mob, double vpX, double vpY, double vpZ);
+Boolean dodgeLineOfSight(Mob * mob, double lookX, double lookY, double lookZ);
+double dotProduct2D(double x1, double z1, double x2, double z2);
 void worldMobInit();
 
 /*Waypoint grid functions*/
