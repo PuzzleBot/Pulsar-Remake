@@ -30,7 +30,7 @@ float vpx = -50.0, vpy = -50.0, vpz = -50.0;
 float oldvpx, oldvpy, oldvpz;
 
 /* mouse direction coordiates */
-float mvx = 0.0, mvy = 135.0, mvz = 0.0;
+float mvx = 0.0, mvy = 225.0, mvz = 0.0;
 
 /* stores current mouse position value */
 float oldx, oldy;

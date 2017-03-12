@@ -27,7 +27,7 @@ void fireBulletFromPlayer(){
 
     double bulletDirectionX, bulletDirectionY, bulletDirectionZ;
     double bulletDirectionLength;
-    static double playerBulletDisplacement = 1;
+    static double playerBulletDisplacement = 1.0;
     static double bulletVelocity = 0.2;
 
     /*Bullet limit*/

@@ -22,6 +22,10 @@ Mob * createNewMob(MobType type, double x, double y, double z){
     newMob->y_pos = y;
     newMob->z_pos = z;
 
+    newMob->x_destinationBlock = -99;
+    newMob->y_destinationBlock = -99;
+    newMob->z_destinationBlock = -99;
+
     newMob->currentAiState = ROAMING;
     newMob->dodgeStepToggle = FALSE;
     newMob->currentHighGridCell[0] = 0;
@@ -74,7 +78,7 @@ void generateValidMobPosition(int * x, int * y, int * z){
         randomX = rand() % horizRange;
         randomZ = rand() % vertRange;
         /*Prevent spawning in the starting cell unless it is the only one*/
-        if(((randomX <= ROOMSIZE) && (randomZ <= ROOMSIZE)) && (GRIDSIZE > 1)){
+        if(((randomX >= (RIGHTWALL - ROOMSIZE)) && (randomZ <= ROOMSIZE)) && (GRIDSIZE > 1)){
             /*Fix it by offsetting x and z to the northeast cell*/
             randomX = randomX + (ROOMSIZE + 1);
             randomZ = randomZ + (ROOMSIZE + 1);
@@ -365,35 +369,37 @@ void processMobAI(Mob * mob){
     deleteBlockList(blocksInPath);
     blocksInPath = NULL;
 
-    return;
-
     /*Move depending on state*/
     if(mob->currentAiState == ROAMING){
         /*If the mob is sitting still, start moving towards another cell*/
-        if((fabs(mob->x_velocity) <= 0.01) && (fabs(mob->y_velocity) <= 0.01) && (fabs(mob->z_velocity) <= 0.01)){
+        if(mobHasObjective(mob) == FALSE){
             /*Look for a surrounding cell that is not blocked by a wall*/
             /*Left path*/
-            if((mobHighGridCellX > 0) && (waypointGrid[mobHighGridCellY][mobHighGridCellX - 1].correspondingWall != NULL) && (waypointGrid[mobHighGridCellY][mobHighGridCellX - 1].correspondingWall->state == OPEN)){
+            if(lineIsClear(mob->x_pos, mob->y_pos, mob->z_pos, mob->x_pos - fmod((mob->x_pos - (double)LEFTWALL), (GRIDSIZE+1)) - (ROOMSIZE/2), mob->y_pos, mob->z_pos) == TRUE){
                 openDirections[numberOfOpenPaths] = LEFT;
                 numberOfOpenPaths++;
+                //printf("Left ");
             }
 
             /*Right path*/
-            if((mobHighGridCellX < (GRIDSIZE * 2) + 1) && (waypointGrid[mobHighGridCellY][mobHighGridCellX + 1].correspondingWall != NULL) && (waypointGrid[mobHighGridCellY][mobHighGridCellX + 1].correspondingWall->state == OPEN)){
+            if(lineIsClear(mob->x_pos, mob->y_pos, mob->z_pos, mob->x_pos + (ROOMSIZE+1 - fmod((mob->x_pos - (double)LEFTWALL), (GRIDSIZE+1))) + (ROOMSIZE/2), mob->y_pos, mob->z_pos) == TRUE){
                 openDirections[numberOfOpenPaths] = RIGHT;
                 numberOfOpenPaths++;
+                //printf("Right ");
             }
 
             /*Lower path*/
-            if((mobHighGridCellY > 0) && (waypointGrid[mobHighGridCellY - 1][mobHighGridCellX].correspondingWall != NULL) && (waypointGrid[mobHighGridCellY - 1][mobHighGridCellX].correspondingWall->state == OPEN)){
+            if(lineIsClear(mob->x_pos, mob->y_pos, mob->z_pos, mob->x_pos, mob->y_pos, mob->z_pos - fmod((mob->z_pos - (double)BOTTOMWALL), (GRIDSIZE+1)) - (ROOMSIZE/2)) == TRUE){
                 openDirections[numberOfOpenPaths] = DOWN;
                 numberOfOpenPaths++;
+                //printf("Down ");
             }
 
             /*Upper path*/
-            if((mobHighGridCellY < (GRIDSIZE * 2) + 1) && (waypointGrid[mobHighGridCellY + 1][mobHighGridCellX].correspondingWall != NULL) && (waypointGrid[mobHighGridCellY + 1][mobHighGridCellX].correspondingWall->state == OPEN)){
+            if(lineIsClear(mob->x_pos, mob->y_pos, mob->z_pos, mob->x_pos, mob->y_pos, mob->z_pos + (ROOMSIZE+1 - fmod((mob->z_pos - (double)BOTTOMWALL), (GRIDSIZE+1))) + (ROOMSIZE/2)) == TRUE){
                 openDirections[numberOfOpenPaths] = UP;
                 numberOfOpenPaths++;
+                //printf("Up ");
             }
 
 
@@ -408,6 +414,7 @@ void processMobAI(Mob * mob){
                         mob->x_destinationBlock = (int)mob->x_pos - (((int)mob->x_pos - LEFTWALL) % (ROOMSIZE+1)) - (ROOMSIZE/2);
                         mob->y_destinationBlock = (int)mob->y_pos;
                         mob->z_destinationBlock = (int)mob->z_pos;
+                        //printf(", Choose left\n");
                         break;
                     case RIGHT:
                         mob->x_velocity = MOB_MOVEMENT_SPEED;
@@ -417,15 +424,7 @@ void processMobAI(Mob * mob){
                         mob->x_destinationBlock = (int)mob->x_pos + (ROOMSIZE+1 - (((int)mob->x_pos - LEFTWALL) % (ROOMSIZE+1))) + (ROOMSIZE/2);
                         mob->y_destinationBlock = (int)mob->y_pos;
                         mob->z_destinationBlock = (int)mob->z_pos;
-                        break;
-                    case UP:
-                        mob->x_velocity = 0;
-                        mob->y_velocity = 0;
-                        mob->z_velocity = MOB_MOVEMENT_SPEED;
-
-                        mob->x_destinationBlock = (int)mob->x_pos;
-                        mob->y_destinationBlock = (int)mob->y_pos;
-                        mob->z_destinationBlock = (int)mob->z_pos - (((int)mob->z_pos - BOTTOMWALL) % (ROOMSIZE+1)) - (ROOMSIZE/2);
+                        //printf(", Choose right\n");
                         break;
                     case DOWN:
                         mob->x_velocity = 0;
@@ -434,76 +433,113 @@ void processMobAI(Mob * mob){
 
                         mob->x_destinationBlock = (int)mob->x_pos;
                         mob->y_destinationBlock = (int)mob->y_pos;
+                        mob->z_destinationBlock = (int)mob->z_pos - (((int)mob->z_pos - BOTTOMWALL) % (ROOMSIZE+1)) - (ROOMSIZE/2);
+                        //printf(", Choose down\n");
+                        break;
+                    case UP:
+                        mob->x_velocity = 0;
+                        mob->y_velocity = 0;
+                        mob->z_velocity = MOB_MOVEMENT_SPEED;
+
+                        mob->x_destinationBlock = (int)mob->x_pos;
+                        mob->y_destinationBlock = (int)mob->y_pos;
                         mob->z_destinationBlock = (int)mob->z_pos + (ROOMSIZE+1 - (((int)mob->z_pos - BOTTOMWALL) % (ROOMSIZE+1))) + (ROOMSIZE/2);
+                        //printf(", Choose up\n");
                         break;
                     default:
                         printf("Error\n");
                         break;
                 }
-                printf("Moving to: %d %d\n", mob->x_destinationBlock, mob->y_destinationBlock);
+                world[mob->x_destinationBlock][FLOORHEIGHT][mob->z_destinationBlock] = 5;
             }
             else{
-                stopMob(mob);
+                discardMobObjective(mob);
             }
         }
         else{
             /*Currently moving, check if a wall closes in the middle of a path
               or the cell has been reached (note: no out of bounds check needed here)*/
 
-            if(mob->x_velocity <= 0){
+            printf("At %d %d\n", (int)mob->x_pos, (int)mob->z_pos);
+            printf("Velocity %.2f %.2f\n", mob->x_velocity, mob->z_velocity);
+            printf("Moving to: %d %d\n", mob->x_destinationBlock, mob->z_destinationBlock);
+
+            if(mob->x_velocity < -0.001){
                 /*Leftward movement - left wall check*/
                 /*Is the mob at the x-position it wanted to travel to?*/
                 if((int)mob->x_pos < mob->x_destinationBlock){
                     /*Destination reached*/
-                    stopMob(mob);
+                    discardMobObjective(mob);
                 }
                 else{
                     /*Destination ahead - check for a wall blocking the path*/
-
+                    if((lineIsClear(mob->x_pos+1, mob->y_pos, mob->z_pos, mob->x_destinationBlock, mob->y_destinationBlock, mob->z_destinationBlock) == FALSE)
+                        || (lineIsClear(mob->x_pos+1, mob->y_pos+1, mob->z_pos+1, mob->x_destinationBlock, mob->y_destinationBlock+1, mob->z_destinationBlock+1) == FALSE)
+                        || (lineIsClear(mob->x_pos+1, mob->y_pos-1, mob->z_pos-1, mob->x_destinationBlock, mob->y_destinationBlock-1, mob->z_destinationBlock-1) == FALSE)){
+                        discardMobObjective(mob);
+                    }
                 }
             }
-            else if(mob->x_velocity > 0){
+            else if(mob->x_velocity > 0.001){
                 /*Rightward movement - right wall check*/
                 /*Is the mob at the cell it wanted to travel to?*/
                 if((int)mob->x_pos > mob->x_destinationBlock){
                     /*Destination reached*/
-                    stopMob(mob);
+                    discardMobObjective(mob);
                 }
                 else{
                     /*Destination ahead - check for a wall blocking the path*/
+                    if((lineIsClear(mob->x_pos-1, mob->y_pos, mob->z_pos, mob->x_destinationBlock, mob->y_destinationBlock, mob->z_destinationBlock) == FALSE)
+                        || (lineIsClear(mob->x_pos-1, mob->y_pos+1, mob->z_pos+1, mob->x_destinationBlock, mob->y_destinationBlock+1, mob->z_destinationBlock+1) == FALSE)
+                        || (lineIsClear(mob->x_pos-1, mob->y_pos-1, mob->z_pos-1, mob->x_destinationBlock, mob->y_destinationBlock-1, mob->z_destinationBlock-1) == FALSE)){
+                        discardMobObjective(mob);
+                    }
                 }
             }
-            else if(mob->z_velocity <= 0){
+            else if(mob->z_velocity < -0.001){
                 /*Downward movement - south wall check*/
                 /*Is the mob at the cell it wanted to travel to?*/
                 if((int)mob->z_pos < mob->z_destinationBlock){
                     /*Destination reached*/
-                    stopMob(mob);
+                    discardMobObjective(mob);
                 }
                 else{
                     /*Destination ahead - check for a wall blocking the path*/
+                    if((lineIsClear(mob->x_pos, mob->y_pos, mob->z_pos+1, mob->x_destinationBlock, mob->y_destinationBlock, mob->z_destinationBlock) == FALSE)
+                        || (lineIsClear(mob->x_pos+1, mob->y_pos+1, mob->z_pos+1, mob->x_destinationBlock+1, mob->y_destinationBlock+1, mob->z_destinationBlock) == FALSE)
+                        || (lineIsClear(mob->x_pos-1, mob->y_pos-1, mob->z_pos+1, mob->x_destinationBlock+1, mob->y_destinationBlock-1, mob->z_destinationBlock) == FALSE)){
+                        discardMobObjective(mob);
+                    }
                 }
             }
-            else if(mob->z_velocity > 0){
+            else if(mob->z_velocity > 0.001){
                 /*Upward movement - north wall check*/
                 /*Is the mob at the cell it wanted to travel to?*/
                 if((int)mob->z_pos > mob->z_destinationBlock){
                     /*Destination reached*/
-                    stopMob(mob);
+                    discardMobObjective(mob);
                 }
                 else{
                     /*Destination ahead - check for a wall blocking the path*/
+                    if((lineIsClear(mob->x_pos, mob->y_pos, mob->z_pos-1, mob->x_destinationBlock, mob->y_destinationBlock, mob->z_destinationBlock) == FALSE)
+                        || (lineIsClear(mob->x_pos+1, mob->y_pos+1, mob->z_pos-1, mob->x_destinationBlock+1, mob->y_destinationBlock+1, mob->z_destinationBlock) == FALSE)
+                        || (lineIsClear(mob->x_pos-1, mob->y_pos-1, mob->z_pos-1, mob->x_destinationBlock+1, mob->y_destinationBlock-1, mob->z_destinationBlock) == FALSE)){
+                        discardMobObjective(mob);
+                    }
                 }
             }
         }
+
+        if(mobHasObjective(mob) == TRUE){
+            moveMob(mob);
+        }
     }
     else if(mob->currentAiState == DODGING){
-
+        /*Do nothing*/
     }
 
     /*Velocity not zero - move the mob*/
     //printf("Velocity: %.2f %.2f %.2f\n", fabs(mob->x_velocity), fabs(mob->y_velocity), fabs(mob->z_velocity));
-    moveMob(mob);
 }
 
 Boolean moveMob(Mob * mob){
@@ -532,7 +568,7 @@ Boolean moveMob(Mob * mob){
         else{
             /*Sidestep by rotating current velocity by 90 degrees counterclockwise
               to try to get around the obstacle*/
-            printf("Attempting to sidestep\n");
+            //printf("Attempting to sidestep\n");
             newX_pos = mob->x_pos + mob->z_velocity;
             newZ_pos = mob->z_pos + mob->x_velocity;
             if(checkMobCollision(newX_pos, newY_pos, newZ_pos, mob) == 0){
@@ -551,7 +587,7 @@ Boolean moveMob(Mob * mob){
                 }
                 else{
                     /*Can't sidestep - don't do anything, wait for the other AI to hopefully move*/
-                    stopMob(mob);
+                    discardMobObjective(mob);
                 }
             }
             return FALSE;
@@ -566,23 +602,20 @@ void stopMob(Mob * mob){
 }
 
 void discardMobObjective(Mob * mob){
+    world[mob->x_destinationBlock][FLOORHEIGHT][mob->z_destinationBlock] = 4;
     mob->x_destinationBlock = -99;
     mob->y_destinationBlock = -99;
     mob->z_destinationBlock = -99;
+    stopMob(mob);
 }
 
 Boolean mobHasObjective(Mob * mob){
-    if((mob->x_destinationBlock == -99) || (mob->y_destinationBlock == -99) || (mob->z_destinationBlock == -99)){
+    if((mob->x_destinationBlock <= -1) || (mob->y_destinationBlock <= -1) || (mob->z_destinationBlock <= -1)){
         return FALSE;
     }
     else{
         return TRUE;
     }
-}
-
-
-void moveTowardObjective(Mob * mob){
-
 }
 
 
@@ -636,14 +669,13 @@ Boolean checkForPlayerWatching(Mob * mob, double vpX, double vpY, double vpZ){
 
 
 Boolean dodgeLineOfSight(Mob * mob, double lookX, double lookY, double lookZ){
-    double newX_pos, newY_pos, newZ_pos;
-    double perpendicularX, perpendicularY, perpendicularZ;
+    double newX_pos, newZ_pos;
+    double perpendicularX, perpendicularZ;
     double perpendicularLength;
     int collidedBlock = 0;
 
     /*Perpendicular vector*/
     perpendicularX = -lookZ;
-    perpendicularY = 0;
     perpendicularZ = lookX;
 
     perpendicularLength = sqrt((lookX * lookX) + (lookZ * lookZ));
@@ -651,17 +683,15 @@ Boolean dodgeLineOfSight(Mob * mob, double lookX, double lookY, double lookZ){
     /*For reversing direction*/
     if(mob->dodgeStepToggle == FALSE){
         newX_pos = mob->x_pos + (MOB_MOVEMENT_SPEED * (perpendicularX / perpendicularLength));
-        newY_pos = mob->y_pos + mob->y_velocity;
         newZ_pos = mob->z_pos + (MOB_MOVEMENT_SPEED * (perpendicularZ / perpendicularLength));
     }
     else{
         newX_pos = mob->x_pos - (MOB_MOVEMENT_SPEED * (perpendicularX / perpendicularLength));
-        newY_pos = mob->y_pos - mob->y_velocity;
         newZ_pos = mob->z_pos - (MOB_MOVEMENT_SPEED * (perpendicularZ / perpendicularLength));
     }
 
     /*Mob is already at its destination - do nothing*/
-    if(((int)newX_pos == (int)mob->x_pos) && ((int)newY_pos == (int)mob->y_pos) && ((int)newZ_pos == (int)mob->z_pos)){
+    if(((int)newX_pos == (int)mob->x_pos) && ((int)newZ_pos == (int)mob->z_pos)){
         clearMobSpace((int)mob->x_pos, (int)mob->y_pos, (int)mob->z_pos);
         //printf("Move: %.2f %.2f\n", (MOB_MOVEMENT_SPEED * (perpendicularX / perpendicularLength)), (MOB_MOVEMENT_SPEED * (perpendicularZ / perpendicularLength)));
         mob->x_pos = newX_pos;
@@ -669,7 +699,7 @@ Boolean dodgeLineOfSight(Mob * mob, double lookX, double lookY, double lookZ){
         return TRUE;
     }
     else{
-        collidedBlock = checkMobCollision(newX_pos, newY_pos, newZ_pos, mob);
+        collidedBlock = checkMobCollision(newX_pos, mob->y_pos, newZ_pos, mob);
         if(collidedBlock == 0){
             /*No collision - safe to sidestep the mob*/
             clearMobSpace((int)mob->x_pos, (int)mob->y_pos, (int)mob->z_pos);
@@ -688,7 +718,7 @@ Boolean dodgeLineOfSight(Mob * mob, double lookX, double lookY, double lookZ){
                 newZ_pos = mob->z_pos - (MOB_MOVEMENT_SPEED * (perpendicularZ / perpendicularLength));
             }
 
-            if(checkMobCollision(newX_pos, newY_pos, newZ_pos, mob) == 0){
+            if(checkMobCollision(newX_pos, mob->y_pos, newZ_pos, mob) == 0){
                 clearMobSpace((int)mob->x_pos, (int)mob->y_pos, (int)mob->z_pos);
                 if(mob->dodgeStepToggle == FALSE){ mob->dodgeStepToggle = TRUE; }
                 else { mob->dodgeStepToggle = FALSE; }

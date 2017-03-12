@@ -71,3 +71,16 @@ Boolean detectWallInPath(BlockList * blocksInPath){
 
     return FALSE;
 }
+
+
+Boolean lineIsClear(double startX, double startY, double startZ, double endX, double endY, double endZ){
+    BlockList * blocksInPath = NULL;
+    Boolean lineClear;
+
+    blocksInPath = getAllBlocksOnLine(blocksInPath, startX+0.001, startY+0.001, startZ+0.001, endX+0.001 , endY+0.001, endZ+0.001);
+    lineClear = (detectWallInPath(blocksInPath) + 1) % 2;
+
+    deleteBlockList(blocksInPath);
+
+    return lineClear;
+}

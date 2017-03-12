@@ -77,7 +77,7 @@ GLubyte  world[WORLDX][WORLDY][WORLDZ];
 #define GRIDSIZE 6
 #define FLOORHEIGHT 10
 
-#define STARTING_WALLS 0
+#define STARTING_WALLS 25
 #define WALL_HEIGHT 5
 
 /*Collision and gravity*/
@@ -93,8 +93,8 @@ GLubyte  world[WORLDX][WORLDY][WORLDZ];
 #define BULLETLIFE 1500
 
 #define MOB_BULLET_ARRAY_START MAX_BULLETS
-#define MOB_MOVEMENT_SPEED 0.80
-#define MOB_SPAWN 1
+#define MOB_MOVEMENT_SPEED 0.40
+#define MOB_SPAWN 2
 
 
 typedef enum{FALSE, TRUE} Boolean;
@@ -240,6 +240,8 @@ void bulletCollision(int bulletId);
 
 void removeBullet(int bulletId);
 
+void initializeBulletArray();
+
 
 /*Mob Functions*/
 Mob * createNewMob(MobType type, double x, double y, double z);
@@ -272,3 +274,4 @@ BlockList * getAllBlocksOnLine(BlockList * listofBlocks, double startX, double s
 BlockList * addToBlockList(BlockList * list, int newBlockX, int newBlockY, int newBlockZ);
 void deleteBlockList(BlockList * list);
 Boolean detectWallInPath(BlockList * blocksInPath);
+Boolean lineIsClear(double startX, double startY, double startZ, double endX, double endY, double endZ);

@@ -345,7 +345,7 @@ void update() {
                 wallTimer = 0;
 
                 /*Open/close walls at random*/
-                /*toggleRandomWall();
+                toggleRandomWall();
                 toggleRandomWall();
                 toggleRandomWall();
                 toggleRandomWall();
@@ -479,7 +479,7 @@ int main(int argc, char** argv)
         initializeBulletArray();
         worldMobInit();
 
-        setViewPosition(-(LEFTWALL+2), -(FLOORHEIGHT+2), -(BOTTOMWALL+2));
+        setViewPosition(-(RIGHTWALL-3), -(FLOORHEIGHT+2), -(BOTTOMWALL+3));
         glutWarpPointer(512, 384);
         motion(512, 384);
 
