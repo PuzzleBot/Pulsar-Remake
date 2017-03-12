@@ -1,5 +1,7 @@
 #include "graphics.h"
 
+extern int allocationCounter;
+
 BlockList * getAllBlocksOnLine(BlockList * listOfBlocks, double startX, double startY, double startZ, double endX, double endY, double endZ){
     /*Step over the line by half-units*/
     double unitLength = sqrt(pow(endX - startX, 2) + pow(endY - startY, 2) + pow(endZ - startZ, 2));
@@ -29,7 +31,6 @@ BlockList * getAllBlocksOnLine(BlockList * listOfBlocks, double startX, double s
         currentY = currentY + yMovement;
         currentZ = currentZ + zMovement;
     }
-
     return(listOfBlocks);
 }
 
@@ -44,6 +45,7 @@ BlockList * addToBlockList(BlockList * list, int newBlockX, int newBlockY, int n
         return newBlock;
     }
     else{
+        printf("Warning: Not enough memory to calculate line of sight!\n");
         return list;
     }
 }

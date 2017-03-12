@@ -76,6 +76,9 @@ extern void tree(float, float, float, float, float, float, int);
 
 /********* end of extern variable declarations **************/
 
+int allocationCounter = 0;
+
+
 /* Time since the last world update, used as a clock for capping FPS */
 struct timeval previousUpdate;
 
@@ -345,10 +348,12 @@ void update() {
                 wallTimer = 0;
 
                 /*Open/close walls at random*/
-                toggleRandomWall();
-                toggleRandomWall();
-                toggleRandomWall();
-                toggleRandomWall();
+                if(!DEBUG_MODE){
+                    toggleRandomWall();
+                    toggleRandomWall();
+                    toggleRandomWall();
+                    toggleRandomWall();
+                }
                 //toggleTwoWalls();*/
                 //printWaypointGrid();
             }

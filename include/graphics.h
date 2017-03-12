@@ -20,6 +20,8 @@ GLubyte  world[WORLDX][WORLDY][WORLDZ];
 /*Maximum FPS*/
 #define FPS_CAP 60
 
+#define DEBUG_MODE FALSE
+
 
 /*2D UI constants for the minimap*/
 #define UI_MAP_BORDER_WIDTH 3
@@ -94,7 +96,7 @@ GLubyte  world[WORLDX][WORLDY][WORLDZ];
 
 #define MOB_BULLET_ARRAY_START MAX_BULLETS
 #define MOB_MOVEMENT_SPEED 0.40
-#define MOB_SPAWN 30
+#define MOB_SPAWN 5
 
 
 typedef enum{FALSE, TRUE} Boolean;

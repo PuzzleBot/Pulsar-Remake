@@ -63,7 +63,7 @@ void drawSmallMinimap(){
     vpY = -vpY;
     vpZ = -vpZ;
 
-    playerSquareLeft = UI_MAP_RIGHT - (vpX - LEFTWALL + 1)*UI_SQUARE_DIM_HORIZ;
+    playerSquareLeft = UI_MAP_RIGHT - (vpX - LEFTWALL)*UI_SQUARE_DIM_HORIZ;
     playerSquareBottom = UI_MAP_BOTTOM + (vpZ - BOTTOMWALL)*UI_SQUARE_DIM_VERT;
 
     set2Dcolour(playerColour);
@@ -205,7 +205,7 @@ void drawFullMap(){
     vpY = -vpY;
     vpZ = -vpZ;
 
-    playerSquareLeft = UI_FULLMAP_RIGHT - (vpX - LEFTWALL + 1)*UI_FULLSQUARE_DIM_HORIZ;
+    playerSquareLeft = UI_FULLMAP_RIGHT - (vpX - LEFTWALL)*UI_FULLSQUARE_DIM_HORIZ;
     playerSquareBottom = UI_FULLMAP_BOTTOM + (vpZ - BOTTOMWALL)*UI_FULLSQUARE_DIM_VERT;
 
     set2Dcolour(playerColour);

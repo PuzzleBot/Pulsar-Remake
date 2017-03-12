@@ -1,7 +1,5 @@
 #include "graphics.h"
 
-#define DEBUG_MODE FALSE
-
 extern HighGrid waypointGrid[(GRIDSIZE * 2) + 1][(GRIDSIZE * 2) + 1];
 extern Bullet bulletArray[BULLET_ARRAY_SIZE];
 Mob * mobList;
@@ -20,9 +18,10 @@ Mob * createNewMob(MobType type, double x, double y, double z, int bulletArrayIn
 
     newMob->type = type;
 
-    newMob->x_pos = x;
-    newMob->y_pos = y;
-    newMob->z_pos = z;
+    /*To evade roundoff errors*/
+    newMob->x_pos = x + 0.001;
+    newMob->y_pos = y + 0.001;
+    newMob->z_pos = z + 0.001;
 
     newMob->x_destinationBlock = -99;
     newMob->y_destinationBlock = -99;
@@ -373,7 +372,7 @@ void processMobAI(Mob * mob){
 
     if(DEBUG_MODE){
         moveMob(mob);
-        printf("At %d %d\n", (int)mob->x_pos, (int)mob->z_pos);
+        //printf("At %d %d\n", (int)mob->x_pos, (int)mob->z_pos);
         return;
     }
 
@@ -472,8 +471,8 @@ void processMobAI(Mob * mob){
             /*Currently moving, check if a wall closes in the middle of a path
               or the cell has been reached (note: no out of bounds check needed here)*/
 
-            printf("At %d %d\n", (int)mob->x_pos, (int)mob->z_pos);
-            /*printf("Velocity %.2f %.2f\n", mob->x_velocity, mob->z_velocity);
+            /*printf("At %d %d\n", (int)mob->x_pos, (int)mob->z_pos);
+            printf("Velocity %.2f %.2f\n", mob->x_velocity, mob->z_velocity);
             printf("Moving to: %d %d\n", mob->x_destinationBlock, mob->z_destinationBlock);*/
 
             if(mob->x_velocity < -0.001){
@@ -757,10 +756,25 @@ double dotProduct2D(double x1, double z1, double x2, double z2){
 void worldMobInit(){
     if(DEBUG_MODE){
         mobList = NULL;
-        mobList = mobAddToFront(mobList, createNewMob(PULSAR, 25, 12.1, 25, 0));
+        mobList = mobAddToFront(mobList, createNewMob(ORBITER, 25, 12, 35, 0));
         mobList->x_velocity = MOB_MOVEMENT_SPEED;
-        mobList = mobAddToFront(mobList, createNewMob(PULSAR, 35, 12.1, 25, 0));
+        mobList->y_velocity = 0;
+        mobList->z_velocity = 0;
+
+        mobList = mobAddToFront(mobList, createNewMob(ORBITER, 45, 12, 35, 0));
         mobList->x_velocity = -MOB_MOVEMENT_SPEED;
+        mobList->y_velocity = 0;
+        mobList->z_velocity = 0;
+
+        mobList = mobAddToFront(mobList, createNewMob(PULSAR, 25, 12, 55, 0));
+        mobList->x_velocity = MOB_MOVEMENT_SPEED;
+        mobList->y_velocity = 0;
+        mobList->z_velocity = 0;
+        mobList = mobAddToFront(mobList, createNewMob(PULSAR, 45, 12, 55, 0));
+        mobList->x_velocity = -MOB_MOVEMENT_SPEED;
+        mobList->y_velocity = 0;
+        mobList->z_velocity = 0;
+
     }
     else{
         mobList = generateRandomMobs(MOB_SPAWN);

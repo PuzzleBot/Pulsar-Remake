@@ -13,7 +13,7 @@ extern void collisionResponse();
 extern void buildDisplayList();
 extern void mouse(int, int, int, int);
 extern void draw2D();
-
+extern int allocationCounter;
 
 /* flags used to control the appearance of the image */
 int lineDrawing = 0;	// draw polygons as solid or lines
@@ -573,6 +573,7 @@ void keyboard(unsigned char key, int x, int y)
     switch (key) {
         case 27:
         case 'q':
+            //printf("Allocs at the end: %d\n", allocationCounter);
             exit(0);
             break;
         case '1':		// draw polygons as outlines
