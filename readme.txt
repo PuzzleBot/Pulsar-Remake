@@ -2,7 +2,7 @@ Brandon Tan
 0845538
 
 CIS 4820
-Assignment 2
+Assignment 3
 ------------------------
 
 -----------------
@@ -23,6 +23,11 @@ src/                - Holds all source code (.c files)
                       projectiles.
     ui.c            - Holds all functions which are involved in maintaining
                       2D objects, including the minimap.
+    mobs.c          - Holds all functions pertaining to mobs, their movement
+                      and their AI
+    sight.c         - Holds all functions regarding determining line of sight
+    world.c (unused)- Holds functions used to manage a higher level view of
+                      the world, called a waypoint grid
 
 test/               - Contains files used to unit test parts of the program.
                       (ignore this)

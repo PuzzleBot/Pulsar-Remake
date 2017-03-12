@@ -546,11 +546,8 @@ void processMobAI(Mob * mob){
         }
     }
     else if(mob->currentAiState == DODGING){
-        /*Do nothing*/
+        /*Do nothing - the functions to move the mob were already called in the checking function*/
     }
-
-    /*Velocity not zero - move the mob*/
-    //printf("Velocity: %.2f %.2f %.2f\n", fabs(mob->x_velocity), fabs(mob->y_velocity), fabs(mob->z_velocity));
 }
 
 Boolean moveMob(Mob * mob){
