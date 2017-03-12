@@ -1,5 +1,7 @@
 #include "graphics.h"
 
+#define DEBUG_MODE FALSE
+
 extern HighGrid waypointGrid[(GRIDSIZE * 2) + 1][(GRIDSIZE * 2) + 1];
 extern Bullet bulletArray[BULLET_ARRAY_SIZE];
 Mob * mobList;
@@ -7,7 +9,7 @@ Mob * mobList;
 extern void getViewPosition(float *, float *, float *);
 extern void getViewOrientation(float *, float *, float *);
 
-Mob * createNewMob(MobType type, double x, double y, double z){
+Mob * createNewMob(MobType type, double x, double y, double z, int bulletArrayIndex){
     int i, j, k;
     Mob * newMob = calloc(1, sizeof(Mob));
 
@@ -57,6 +59,9 @@ Mob * createNewMob(MobType type, double x, double y, double z){
         default:
             break;
     }
+
+    newMob->mobBullet = &bulletArray[MOB_BULLET_ARRAY_START + bulletArrayIndex];
+    newMob->bulletArrayId = MOB_BULLET_ARRAY_START + bulletArrayIndex;
 
     newMob->next = NULL;
     newMob->prev = NULL;
@@ -164,10 +169,7 @@ Mob * generateRandomMobs(int count){
         }
 
         generateValidMobPosition(&mobX, &mobY, &mobZ);
-        newMobList = mobAddToFront(newMobList, createNewMob(chosenType, mobX, mobY, mobZ));
-
-        newMobList->mobBullet = &bulletArray[MOB_BULLET_ARRAY_START + i];
-        newMobList->bulletArrayId = MOB_BULLET_ARRAY_START + i;
+        newMobList = mobAddToFront(newMobList, createNewMob(chosenType, mobX, mobY, mobZ, i));
     }
 
     return(newMobList);
@@ -369,6 +371,12 @@ void processMobAI(Mob * mob){
     deleteBlockList(blocksInPath);
     blocksInPath = NULL;
 
+    if(DEBUG_MODE){
+        moveMob(mob);
+        printf("At %d %d\n", (int)mob->x_pos, (int)mob->z_pos);
+        return;
+    }
+
     /*Move depending on state*/
     if(mob->currentAiState == ROAMING){
         /*If the mob is sitting still, start moving towards another cell*/
@@ -450,7 +458,11 @@ void processMobAI(Mob * mob){
                         printf("Error\n");
                         break;
                 }
-                world[mob->x_destinationBlock][FLOORHEIGHT][mob->z_destinationBlock] = 5;
+
+                /*For debugging*/
+                if(DEBUG_MODE == TRUE){
+                    world[mob->x_destinationBlock][FLOORHEIGHT][mob->z_destinationBlock] = 5;
+                }
             }
             else{
                 discardMobObjective(mob);
@@ -461,8 +473,8 @@ void processMobAI(Mob * mob){
               or the cell has been reached (note: no out of bounds check needed here)*/
 
             printf("At %d %d\n", (int)mob->x_pos, (int)mob->z_pos);
-            printf("Velocity %.2f %.2f\n", mob->x_velocity, mob->z_velocity);
-            printf("Moving to: %d %d\n", mob->x_destinationBlock, mob->z_destinationBlock);
+            /*printf("Velocity %.2f %.2f\n", mob->x_velocity, mob->z_velocity);
+            printf("Moving to: %d %d\n", mob->x_destinationBlock, mob->z_destinationBlock);*/
 
             if(mob->x_velocity < -0.001){
                 /*Leftward movement - left wall check*/
@@ -571,6 +583,7 @@ Boolean moveMob(Mob * mob){
             //printf("Attempting to sidestep\n");
             newX_pos = mob->x_pos + mob->z_velocity;
             newZ_pos = mob->z_pos + mob->x_velocity;
+
             if(checkMobCollision(newX_pos, newY_pos, newZ_pos, mob) == 0){
                 clearMobSpace((int)mob->x_pos, (int)mob->y_pos, (int)mob->z_pos);
                 mob->x_pos = newX_pos;
@@ -578,8 +591,8 @@ Boolean moveMob(Mob * mob){
             }
             else{
                 /*If the mob can't sidestep that way, try the other way*/
-                newX_pos = -newX_pos;
-                newZ_pos = -newZ_pos;
+                newX_pos = mob->x_pos - mob->z_velocity;
+                newZ_pos = mob->z_pos - mob->x_velocity;
                 if(checkMobCollision(newX_pos, newY_pos, newZ_pos, mob) == 0){
                     clearMobSpace((int)mob->x_pos, (int)mob->y_pos, (int)mob->z_pos);
                     mob->x_pos = newX_pos;
@@ -602,7 +615,9 @@ void stopMob(Mob * mob){
 }
 
 void discardMobObjective(Mob * mob){
-    world[mob->x_destinationBlock][FLOORHEIGHT][mob->z_destinationBlock] = 4;
+    if(DEBUG_MODE == TRUE){
+        world[mob->x_destinationBlock][FLOORHEIGHT][mob->z_destinationBlock] = 4;
+    }
     mob->x_destinationBlock = -99;
     mob->y_destinationBlock = -99;
     mob->z_destinationBlock = -99;
@@ -740,5 +755,14 @@ double dotProduct2D(double x1, double z1, double x2, double z2){
 
 
 void worldMobInit(){
-    mobList = generateRandomMobs(MOB_SPAWN);
+    if(DEBUG_MODE){
+        mobList = NULL;
+        mobList = mobAddToFront(mobList, createNewMob(PULSAR, 25, 12.1, 25, 0));
+        mobList->x_velocity = MOB_MOVEMENT_SPEED;
+        mobList = mobAddToFront(mobList, createNewMob(PULSAR, 35, 12.1, 25, 0));
+        mobList->x_velocity = -MOB_MOVEMENT_SPEED;
+    }
+    else{
+        mobList = generateRandomMobs(MOB_SPAWN);
+    }
 }

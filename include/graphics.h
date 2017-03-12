@@ -94,7 +94,7 @@ GLubyte  world[WORLDX][WORLDY][WORLDZ];
 
 #define MOB_BULLET_ARRAY_START MAX_BULLETS
 #define MOB_MOVEMENT_SPEED 0.40
-#define MOB_SPAWN 2
+#define MOB_SPAWN 30
 
 
 typedef enum{FALSE, TRUE} Boolean;
@@ -244,7 +244,7 @@ void initializeBulletArray();
 
 
 /*Mob Functions*/
-Mob * createNewMob(MobType type, double x, double y, double z);
+Mob * createNewMob(MobType type, double x, double y, double z, int bulletArrayIndex);
 void generateValidMobPosition(int * x, int * y, int * z);
 Mob * mobAddToFront(Mob * mobList, Mob * newMob);
 Mob * mobDeleteFromFront(Mob * mobList);
