@@ -40,7 +40,7 @@ Compiling and Running the program
 To compile the program, type "make" into the terminal while
 in the directory that this readme is located in.
 
-After compiling, type either "./a1" or "make run" to run the program.
+After compiling, type either "./a3" or "make run" to run the program.
 
 
 ----------------------
@@ -57,6 +57,17 @@ probability. Since you can break the moving walls using shots, getting stuck
 is not a problem.
 
 Players are limited to having 12 bullets in the world at any time.
+
+5 mobs are spawned in the world on startup, with at least one of each type.
+
+Mobs will try to dodge the line of sight by sidestepping in one set direction,
+and then changing to the opposite direction if they bump a wall while the 
+player is looking.
+
+Mobs won't try to move through walls (and will change their path if a wall cuts
+them off), but if a wall closes on a mob, the wall will just open itself again
+before colliding with the mob.
+
 
 -----------------
 Known issues
@@ -77,6 +88,14 @@ blue walls. They will, however, disappear correctly when they eventually hit the
 world border.
 
 Shooting straight up or down has weird results.
+
+The game can very rarely crash in the event that a bunch of mobs try to move to
+the exact same location and just end up trying to sidestep around each other
+infinitely. It doesn't happen with 5 mobs in the game at once (I think) 
+but does happen with 30 mobs in the game.
+
+
+
 
 
 
