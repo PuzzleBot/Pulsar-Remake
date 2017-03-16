@@ -100,6 +100,9 @@ extern HighGrid waypointGrid[(GRIDSIZE * 2) + 1][(GRIDSIZE * 2) + 1];
 extern Mob * mobList;
 int mobTimer = 0;
 
+
+Boolean playerHasKey = FALSE;
+
 /*** collisionResponse() ***/
 /* -performs collision detection and response */
 /*  sets new xyz  to position of the viewpoint after collision */
@@ -144,12 +147,19 @@ void collisionResponse() {
 
     /*Check for collision or out of bounds*/
     if((world[newBlockX][newBlockY][newBlockZ] != 0) || (world[newBlockX][newBlockY+1][newBlockZ] != 0) || (newBlockX >= WORLDX) || (newBlockX <= 0) || (newBlockY >= WORLDY) || (newBlockY <= 0) || (newBlockZ >= WORLDZ) || (newBlockZ <= 0)){
-        /*printf("Collision: %d %d %d\n", newBlockX, newBlockY, newBlockZ);*/
+        /*Door check - if the door is collided with and the player is holding a key, there is
+          no need to do the collision check*/
+        if((playerHasKey == TRUE) && (((world[newBlockX][newBlockY][newBlockZ+1] == CUBE_BLACK) && (world[newBlockX][newBlockY][newBlockZ-1] == CUBE_BLACK))
+                                        || ((world[newBlockX+1][newBlockY][newBlockZ] == CUBE_BLACK) && (world[newBlockX-1][newBlockY][newBlockZ] == CUBE_BLACK)))){
+            mazeDoor();
+            return;
+        }
+
 
         if(newBlockZ < oldBlockZ){
             /*Climb 1-block high walls*/
             if((world[newBlockX][newBlockY+1][newBlockZ] == 0) && (world[newBlockX][newBlockY+2][newBlockZ] == 0) && (world[newBlockX][newBlockY][newBlockZ] != 0)){
-                newY = newY + 1;
+                handleSingleBlock(&newBlockX, &newBlockY, &newBlockZ);
             }
             else{
                 /*North side detection*/
@@ -160,7 +170,7 @@ void collisionResponse() {
         else if(newBlockZ > oldBlockZ){
             /*Climb 1-block high walls*/
             if((world[newBlockX][newBlockY+1][newBlockZ] == 0) && (world[newBlockX][newBlockY+2][newBlockZ] == 0) && (world[newBlockX][newBlockY][newBlockZ] != 0)){
-                newY = newY + 1;
+                handleSingleBlock(&newBlockX, &newBlockY, &newBlockZ);
             }
             else{
                 /*South side detection*/
@@ -172,7 +182,7 @@ void collisionResponse() {
         if(newBlockX < oldBlockX){
             /*Climb 1-block high walls*/
             if((world[newBlockX][newBlockY+1][newBlockZ] == 0) && (world[newBlockX][newBlockY+2][newBlockZ] == 0) && (world[newBlockX][newBlockY][newBlockZ] != 0)){
-                newY = newY + 1;
+                handleSingleBlock(&newBlockX, &newBlockY, &newBlockZ);
             }
             else{
                 /*Right side detection*/
@@ -183,7 +193,7 @@ void collisionResponse() {
         else if(newBlockX > oldBlockX){
             /*Climb 1-block high walls*/
             if((world[newBlockX][newBlockY+1][newBlockZ] == 0) && (world[newBlockX][newBlockY+2][newBlockZ] == 0) && (world[newBlockX][newBlockY][newBlockZ] != 0)){
-                newY = newY + 1;
+                handleSingleBlock(&newBlockX, &newBlockY, &newBlockZ);
             }
             else{
                 /*Left side detection*/
@@ -247,6 +257,8 @@ void draw2D() {
         else if(displayMap == 2){
             drawFullMap();
         }
+
+        drawGameplayUI();
 
     }
 
@@ -471,20 +483,8 @@ int main(int argc, char** argv)
         /* your code to build the world goes here */
         /*RNG seed*/
         srand(time(NULL));
-        buildStaticObjects();
-        /*Initialize the walls array*/
-        for(i = 0; i < GRIDSIZE+1; i++){
-            for(j = 0; j < GRIDSIZE; j++){
-                x_walls[i][j].state = OPEN;
-                z_walls[j][i].state = OPEN;
-            }
-        }
-        initializeWalls();
-        initWaypointGrid();
-        initializeBulletArray();
-        worldMobInit();
+        resetMaze();
 
-        setViewPosition(-(RIGHTWALL-3), -(FLOORHEIGHT+2), -(BOTTOMWALL+3));
         glutWarpPointer(512, 384);
         motion(512, 384);
 

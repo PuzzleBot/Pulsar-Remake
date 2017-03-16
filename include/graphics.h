@@ -79,6 +79,18 @@ GLubyte  world[WORLDX][WORLDY][WORLDZ];
 
 
 
+#define UI_KEY_PIXEL_SIZE 5
+#define UI_KEY_BOX_SIZE (UI_KEY_PIXEL_SIZE * 11)
+#define UI_KEY_BORDER_THICC 3
+
+#define UI_KEY_BOX_RIGHT (UI_MAP_RIGHT)
+#define UI_KEY_BOX_TOP (UI_MAP_BOTTOM - 10)
+#define UI_KEY_BOX_LEFT (UI_KEY_BOX_RIGHT - UI_KEY_BOX_SIZE)
+#define UI_KEY_BOX_BOTTOM (UI_KEY_BOX_TOP - UI_KEY_BOX_SIZE)
+
+
+
+
 /*World building constants*/
 #define MAX_DISPLAY_LIST 500000
 
@@ -243,6 +255,10 @@ void drawSmallMinimap();
 /*Draws a large map in the center of the screen*/
 void drawFullMap();
 
+void drawGameplayUI();
+
+
+
 /*Fires a bullet from the player based on their view*/
 void fireBulletFromPlayer();
 
@@ -347,3 +363,13 @@ Boolean detectWallInPath(BlockList * blocksInPath);
 
 /*Determines if there are no walls on a line*/
 Boolean lineIsClear(double startX, double startY, double startZ, double endX, double endY, double endZ);
+
+
+
+/*Gameplay-related functions*/
+
+void handleSingleBlock(int * blockX, int * blockY, int * blockZ);
+
+void mazeDoor();
+
+void resetMaze();

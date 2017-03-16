@@ -14,6 +14,8 @@ extern int screenWidth, screenHeight;
 /* flag indicates if map is to be printed */
 extern int displayMap;
 
+extern Boolean playerHasKey;
+
 extern Bullet bulletArray[BULLET_ARRAY_SIZE];
 
 /*Wall and floor colours*/
@@ -313,4 +315,34 @@ void drawFullMap(){
             }
         }
     }
+}
+
+void drawKey(){
+    set2Dcolour(black);
+    draw2Dbox(UI_KEY_BOX_LEFT + (5 * UI_KEY_PIXEL_SIZE), UI_KEY_BOX_BOTTOM + (7 * UI_KEY_PIXEL_SIZE), UI_KEY_BOX_LEFT + (6 * UI_KEY_PIXEL_SIZE), UI_KEY_BOX_BOTTOM + (8 * UI_KEY_PIXEL_SIZE));
+    draw2Dbox(UI_KEY_BOX_LEFT + (6 * UI_KEY_PIXEL_SIZE), UI_KEY_BOX_BOTTOM + (3 * UI_KEY_PIXEL_SIZE), UI_KEY_BOX_LEFT + (7 * UI_KEY_PIXEL_SIZE), UI_KEY_BOX_BOTTOM + (4 * UI_KEY_PIXEL_SIZE));
+    set2Dcolour(white);
+    draw2Dbox(UI_KEY_BOX_LEFT + (4 * UI_KEY_PIXEL_SIZE), UI_KEY_BOX_BOTTOM + (6 * UI_KEY_PIXEL_SIZE), UI_KEY_BOX_LEFT + (7 * UI_KEY_PIXEL_SIZE), UI_KEY_BOX_BOTTOM + (9 * UI_KEY_PIXEL_SIZE));
+    draw2Dbox(UI_KEY_BOX_LEFT + (5 * UI_KEY_PIXEL_SIZE), UI_KEY_BOX_BOTTOM + (5 * UI_KEY_PIXEL_SIZE), UI_KEY_BOX_LEFT + (6 * UI_KEY_PIXEL_SIZE), UI_KEY_BOX_BOTTOM + (6 * UI_KEY_PIXEL_SIZE));
+    draw2Dbox(UI_KEY_BOX_LEFT + (5 * UI_KEY_PIXEL_SIZE), UI_KEY_BOX_BOTTOM + (2 * UI_KEY_PIXEL_SIZE), UI_KEY_BOX_LEFT + (7 * UI_KEY_PIXEL_SIZE), UI_KEY_BOX_BOTTOM + (5 * UI_KEY_PIXEL_SIZE));
+
+}
+
+
+void drawGameplayUI(){
+    /*Draw the key if it has been acquired*/
+    if(playerHasKey == TRUE){
+        drawKey();
+    }
+
+    /*Draw the box containing the key*/
+    set2Dcolour(yellow);
+    draw2Dline(UI_KEY_BOX_RIGHT, UI_KEY_BOX_TOP, UI_KEY_BOX_LEFT, UI_KEY_BOX_TOP, UI_KEY_BORDER_THICC);
+    draw2Dline(UI_KEY_BOX_RIGHT, UI_KEY_BOX_BOTTOM, UI_KEY_BOX_LEFT, UI_KEY_BOX_BOTTOM, UI_KEY_BORDER_THICC);
+    draw2Dline(UI_KEY_BOX_LEFT, UI_KEY_BOX_TOP, UI_KEY_BOX_LEFT, UI_KEY_BOX_BOTTOM, UI_KEY_BORDER_THICC);
+    draw2Dline(UI_KEY_BOX_RIGHT, UI_KEY_BOX_TOP, UI_KEY_BOX_RIGHT, UI_KEY_BOX_BOTTOM, UI_KEY_BORDER_THICC);
+
+    set2Dcolour(black);
+    draw2Dbox(UI_KEY_BOX_LEFT, UI_KEY_BOX_BOTTOM, UI_KEY_BOX_RIGHT, UI_KEY_BOX_TOP);
+
 }

@@ -1,6 +1,6 @@
 TARGET =
 INCLUDES = -F/System/Library/Frameworks -framework OpenGL -framework GLUT -lm -Iinclude -Wno-deprecated-declarations
-FILES = src/a1.c src/graphics.c src/visible.c src/wall.c src/projectile.c src/ui.c src/mobs.c src/world.c src/sight.c
+FILES = src/a1.c src/graphics.c src/visible.c src/wall.c src/projectile.c src/ui.c src/mobs.c src/world.c src/sight.c src/gameplay.c
 
 all: a3
 
