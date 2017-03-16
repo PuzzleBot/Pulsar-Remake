@@ -116,7 +116,7 @@ void drawSmallMinimap(){
                UI_MAP_BORDER_WIDTH);
 
     for(i = LEFTWALL; i <= RIGHTWALL; i++){
-        for(j = FLOORHEIGHT+3; j >= FLOORHEIGHT; j--){
+        for(j = FLOORHEIGHT+WALL_HEIGHT; j >= FLOORHEIGHT; j--){
             /*Draw the map from top to bottom to prevent overlap (y)*/
 
             currentBufferValue = j - FLOORHEIGHT + 1;
@@ -257,7 +257,7 @@ void drawFullMap(){
                UI_FULLMAP_BORDER_WIDTH);
 
     for(i = LEFTWALL; i <= RIGHTWALL; i++){
-        for(j = FLOORHEIGHT+3; j >= FLOORHEIGHT; j--){
+        for(j = FLOORHEIGHT+WALL_HEIGHT; j >= FLOORHEIGHT; j--){
             /*Draw the map from top to bottom to prevent overlap (y)*/
 
             currentBufferValue = j - FLOORHEIGHT + 1;

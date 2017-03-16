@@ -40,7 +40,7 @@ Mob * createNewMob(MobType type, double x, double y, double z, int bulletArrayIn
             for(i = -1; i <= 1; i++){
                 for(j = -1; j <= 1; j++){
                     for(k = -1; k <= 1; k++){
-                        world[(int)x + i][(int)y + j][(int)z + k] = 8;
+                        world[(int)x + i][(int)y + j][(int)z + k] = CUBE_YELLOW;
                     }
                 }
             }
@@ -50,7 +50,7 @@ Mob * createNewMob(MobType type, double x, double y, double z, int bulletArrayIn
             for(i = -1; i <= 1; i++){
                 for(j = -1; j <= 1; j++){
                     for(k = -1; k <= 1; k++){
-                        world[(int)x + i][(int)y + j][(int)z + k] = 3;
+                        world[(int)x + i][(int)y + j][(int)z + k] = CUBE_RED;
                     }
                 }
             }
@@ -183,7 +183,7 @@ int checkMobCollision(double destinationX, double destinationY, double destinati
             for(k = -1; k <= 1; k++){
                 if((abs((int)destinationX + i - (int)mob->x_pos) > 1) || (abs((int)destinationY + j - (int)mob->y_pos) > 1) || (abs((int)destinationZ + k - (int)mob->z_pos) > 1)){
                     if(world[(int)destinationX + i][(int)destinationY + j][(int)destinationZ + k] != 0){
-                        if((collisionColour != 2) && (collisionColour != 6)){
+                        if((collisionColour != 2) && (collisionColour != 5) && (collisionColour != 6)){
                             collisionColour = world[(int)destinationX + i][(int)destinationY + j][(int)destinationZ + k];
                         }
                     }
@@ -216,7 +216,7 @@ void animateSingleMob(Mob * mob){
     for(i = -1; i <= 1; i++){
         for(j = -1; j <= 1; j++){
             for(k = -1; k <= 1; k++){
-                world[mobBlockX + i][mobBlockY + j][mobBlockZ + k] = 0;
+                world[mobBlockX + i][mobBlockY + j][mobBlockZ + k] = CUBE_EMPTY;
             }
         }
     }
@@ -225,39 +225,39 @@ void animateSingleMob(Mob * mob){
 
     if(mob->type == ORBITER){
         /*Static parts of the mob*/
-        world[mobBlockX][mobBlockY][mobBlockZ] = 8;
-        world[mobBlockX+1][mobBlockY][mobBlockZ] = 8;
-        world[mobBlockX-1][mobBlockY][mobBlockZ] = 8;
-        world[mobBlockX][mobBlockY+1][mobBlockZ] = 8;
-        world[mobBlockX][mobBlockY-1][mobBlockZ] = 8;
-        world[mobBlockX][mobBlockY][mobBlockZ+1] = 8;
-        world[mobBlockX][mobBlockY][mobBlockZ-1] = 8;
+        world[mobBlockX][mobBlockY][mobBlockZ] = CUBE_YELLOW;
+        world[mobBlockX+1][mobBlockY][mobBlockZ] = CUBE_YELLOW;
+        world[mobBlockX-1][mobBlockY][mobBlockZ] = CUBE_YELLOW;
+        world[mobBlockX][mobBlockY+1][mobBlockZ] = CUBE_YELLOW;
+        world[mobBlockX][mobBlockY-1][mobBlockZ] = CUBE_YELLOW;
+        world[mobBlockX][mobBlockY][mobBlockZ+1] = CUBE_YELLOW;
+        world[mobBlockX][mobBlockY][mobBlockZ-1] = CUBE_YELLOW;
 
         /*Animated pieces of the mob*/
         switch(mob->currentAnimationFrame){
             case 0:
-                world[mobBlockX+1][mobBlockY][mobBlockZ] = 7;
+                world[mobBlockX+1][mobBlockY][mobBlockZ] = CUBE_ORANGE;
                 break;
             case 1:
-                world[mobBlockX+1][mobBlockY][mobBlockZ+1] = 7;
+                world[mobBlockX+1][mobBlockY][mobBlockZ+1] = CUBE_ORANGE;
                 break;
             case 2:
-                world[mobBlockX][mobBlockY][mobBlockZ+1] = 7;
+                world[mobBlockX][mobBlockY][mobBlockZ+1] = CUBE_ORANGE;
                 break;
             case 3:
-                world[mobBlockX-1][mobBlockY][mobBlockZ+1] = 7;
+                world[mobBlockX-1][mobBlockY][mobBlockZ+1] = CUBE_ORANGE;
                 break;
             case 4:
-                world[mobBlockX-1][mobBlockY][mobBlockZ] = 7;
+                world[mobBlockX-1][mobBlockY][mobBlockZ] = CUBE_ORANGE;
                 break;
             case 5:
-                world[mobBlockX-1][mobBlockY][mobBlockZ-1] = 7;
+                world[mobBlockX-1][mobBlockY][mobBlockZ-1] = CUBE_ORANGE;
                 break;
             case 6:
-                world[mobBlockX][mobBlockY][mobBlockZ-1] = 7;
+                world[mobBlockX][mobBlockY][mobBlockZ-1] = CUBE_ORANGE;
                 break;
             case 7:
-                world[mobBlockX+1][mobBlockY][mobBlockZ-1] = 7;
+                world[mobBlockX+1][mobBlockY][mobBlockZ-1] = CUBE_ORANGE;
                 break;
             default:
                 break;
@@ -266,56 +266,56 @@ void animateSingleMob(Mob * mob){
     }
     else if(mob->type == PULSAR){
         /*Static parts of the mob*/
-        world[mobBlockX][mobBlockY][mobBlockZ] = 3;
-        world[mobBlockX+1][mobBlockY+1][mobBlockZ+1] = 3;
-        world[mobBlockX+1][mobBlockY+1][mobBlockZ-1] = 3;
-        world[mobBlockX-1][mobBlockY+1][mobBlockZ+1] = 3;
-        world[mobBlockX-1][mobBlockY+1][mobBlockZ-1] = 3;
-        world[mobBlockX+1][mobBlockY-1][mobBlockZ+1] = 3;
-        world[mobBlockX+1][mobBlockY-1][mobBlockZ-1] = 3;
-        world[mobBlockX-1][mobBlockY-1][mobBlockZ+1] = 3;
-        world[mobBlockX-1][mobBlockY-1][mobBlockZ-1] = 3;
+        world[mobBlockX][mobBlockY][mobBlockZ] = CUBE_RED;
+        world[mobBlockX+1][mobBlockY+1][mobBlockZ+1] = CUBE_RED;
+        world[mobBlockX+1][mobBlockY+1][mobBlockZ-1] = CUBE_RED;
+        world[mobBlockX-1][mobBlockY+1][mobBlockZ+1] = CUBE_RED;
+        world[mobBlockX-1][mobBlockY+1][mobBlockZ-1] = CUBE_RED;
+        world[mobBlockX+1][mobBlockY-1][mobBlockZ+1] = CUBE_RED;
+        world[mobBlockX+1][mobBlockY-1][mobBlockZ-1] = CUBE_RED;
+        world[mobBlockX-1][mobBlockY-1][mobBlockZ+1] = CUBE_RED;
+        world[mobBlockX-1][mobBlockY-1][mobBlockZ-1] = CUBE_RED;
 
         /*Animated pieces of the mob*/
         switch(mob->currentAnimationFrame){
             case 0:
                 break;
             case 1:
-                world[mobBlockX+1][mobBlockY][mobBlockZ] = 3;
-                world[mobBlockX-1][mobBlockY][mobBlockZ] = 3;
-                world[mobBlockX][mobBlockY+1][mobBlockZ] = 3;
-                world[mobBlockX][mobBlockY-1][mobBlockZ] = 3;
-                world[mobBlockX][mobBlockY][mobBlockZ+1] = 3;
-                world[mobBlockX][mobBlockY][mobBlockZ-1] = 3;
+                world[mobBlockX+1][mobBlockY][mobBlockZ] = CUBE_RED;
+                world[mobBlockX-1][mobBlockY][mobBlockZ] = CUBE_RED;
+                world[mobBlockX][mobBlockY+1][mobBlockZ] = CUBE_RED;
+                world[mobBlockX][mobBlockY-1][mobBlockZ] = CUBE_RED;
+                world[mobBlockX][mobBlockY][mobBlockZ+1] = CUBE_RED;
+                world[mobBlockX][mobBlockY][mobBlockZ-1] = CUBE_RED;
                 break;
             case 2:
-                world[mobBlockX+1][mobBlockY][mobBlockZ] = 3;
-                world[mobBlockX-1][mobBlockY][mobBlockZ] = 3;
-                world[mobBlockX][mobBlockY+1][mobBlockZ] = 3;
-                world[mobBlockX][mobBlockY-1][mobBlockZ] = 3;
-                world[mobBlockX][mobBlockY][mobBlockZ+1] = 3;
-                world[mobBlockX][mobBlockY][mobBlockZ-1] = 3;
+                world[mobBlockX+1][mobBlockY][mobBlockZ] = CUBE_RED;
+                world[mobBlockX-1][mobBlockY][mobBlockZ] = CUBE_RED;
+                world[mobBlockX][mobBlockY+1][mobBlockZ] = CUBE_RED;
+                world[mobBlockX][mobBlockY-1][mobBlockZ] = CUBE_RED;
+                world[mobBlockX][mobBlockY][mobBlockZ+1] = CUBE_RED;
+                world[mobBlockX][mobBlockY][mobBlockZ-1] = CUBE_RED;
 
-                world[mobBlockX+1][mobBlockY+1][mobBlockZ] = 3;
-                world[mobBlockX+1][mobBlockY-1][mobBlockZ] = 3;
-                world[mobBlockX+1][mobBlockY][mobBlockZ+1] = 3;
-                world[mobBlockX+1][mobBlockY][mobBlockZ-1] = 3;
-                world[mobBlockX][mobBlockY+1][mobBlockZ+1] = 3;
-                world[mobBlockX][mobBlockY-1][mobBlockZ+1] = 3;
-                world[mobBlockX][mobBlockY+1][mobBlockZ-1] = 3;
-                world[mobBlockX][mobBlockY-1][mobBlockZ-1] = 3;
-                world[mobBlockX-1][mobBlockY+1][mobBlockZ] = 3;
-                world[mobBlockX-1][mobBlockY-1][mobBlockZ] = 3;
-                world[mobBlockX-1][mobBlockY][mobBlockZ+1] = 3;
-                world[mobBlockX-1][mobBlockY][mobBlockZ-1] = 3;
+                world[mobBlockX+1][mobBlockY+1][mobBlockZ] = CUBE_RED;
+                world[mobBlockX+1][mobBlockY-1][mobBlockZ] = CUBE_RED;
+                world[mobBlockX+1][mobBlockY][mobBlockZ+1] = CUBE_RED;
+                world[mobBlockX+1][mobBlockY][mobBlockZ-1] = CUBE_RED;
+                world[mobBlockX][mobBlockY+1][mobBlockZ+1] = CUBE_RED;
+                world[mobBlockX][mobBlockY-1][mobBlockZ+1] = CUBE_RED;
+                world[mobBlockX][mobBlockY+1][mobBlockZ-1] = CUBE_RED;
+                world[mobBlockX][mobBlockY-1][mobBlockZ-1] = CUBE_RED;
+                world[mobBlockX-1][mobBlockY+1][mobBlockZ] = CUBE_RED;
+                world[mobBlockX-1][mobBlockY-1][mobBlockZ] = CUBE_RED;
+                world[mobBlockX-1][mobBlockY][mobBlockZ+1] = CUBE_RED;
+                world[mobBlockX-1][mobBlockY][mobBlockZ-1] = CUBE_RED;
                 break;
             case 3:
-                world[mobBlockX+1][mobBlockY][mobBlockZ] = 3;
-                world[mobBlockX-1][mobBlockY][mobBlockZ] = 3;
-                world[mobBlockX][mobBlockY+1][mobBlockZ] = 3;
-                world[mobBlockX][mobBlockY-1][mobBlockZ] = 3;
-                world[mobBlockX][mobBlockY][mobBlockZ+1] = 3;
-                world[mobBlockX][mobBlockY][mobBlockZ-1] = 3;
+                world[mobBlockX+1][mobBlockY][mobBlockZ] = CUBE_RED;
+                world[mobBlockX-1][mobBlockY][mobBlockZ] = CUBE_RED;
+                world[mobBlockX][mobBlockY+1][mobBlockZ] = CUBE_RED;
+                world[mobBlockX][mobBlockY-1][mobBlockZ] = CUBE_RED;
+                world[mobBlockX][mobBlockY][mobBlockZ+1] = CUBE_RED;
+                world[mobBlockX][mobBlockY][mobBlockZ-1] = CUBE_RED;
                 break;
             default:
                 break;

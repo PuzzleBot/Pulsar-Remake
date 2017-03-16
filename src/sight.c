@@ -19,7 +19,7 @@ BlockList * getAllBlocksOnLine(BlockList * listOfBlocks, double startX, double s
 
     int i;
     for(i = 0; i < numberOfMovements; i++){
-        if(((world[(int)currentX][(int)currentY][(int)currentZ] == 2) || (world[(int)currentX][(int)currentY][(int)currentZ] == 4) || (world[(int)currentX][(int)currentY][(int)currentZ] == 6))
+        if((world[(int)currentX][(int)currentY][(int)currentZ] != CUBE_EMPTY)
             && (((int)currentX != lastX) || ((int)currentY != lastY) || ((int)currentZ != lastZ))){
             listOfBlocks = addToBlockList(listOfBlocks, (int)currentX, (int)currentY, (int)currentZ);
             lastX = (int)currentX;
@@ -64,7 +64,7 @@ Boolean detectWallInPath(BlockList * blocksInPath){
     BlockList * currentBlock = blocksInPath;
 
     while(currentBlock != NULL){
-        if((world[currentBlock->x][currentBlock->y][currentBlock->z] == 2) || (world[currentBlock->x][currentBlock->y][currentBlock->z] == 4) || (world[currentBlock->x][currentBlock->y][currentBlock->z] == 6)){
+        if((world[currentBlock->x][currentBlock->y][currentBlock->z] == 2) || (world[currentBlock->x][currentBlock->y][currentBlock->z] == 4) || (world[currentBlock->x][currentBlock->y][currentBlock->z] == 5) || (world[currentBlock->x][currentBlock->y][currentBlock->z] == 6)){
             return TRUE;
         }
 
@@ -80,6 +80,8 @@ Boolean lineIsClear(double startX, double startY, double startZ, double endX, do
     Boolean lineClear;
 
     blocksInPath = getAllBlocksOnLine(blocksInPath, startX+0.001, startY+0.001, startZ+0.001, endX+0.001 , endY+0.001, endZ+0.001);
+
+    /*Weird math basically converts true to false and false to true*/
     lineClear = (detectWallInPath(blocksInPath) + 1) % 2;
 
     deleteBlockList(blocksInPath);

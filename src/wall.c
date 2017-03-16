@@ -12,13 +12,14 @@ extern void getViewPosition(float *, float *, float *);
 /* Build the floor, static walls and pillars */
 void buildStaticObjects(){
     int i, j, k;
+    int keyX, keyY, keyZ;
 
-    world[LEFTWALL][FLOORHEIGHT+3][BOTTOMWALL] = 3;
+    world[LEFTWALL][FLOORHEIGHT+3][BOTTOMWALL] = CUBE_RED;
 
     /*Build the floor*/
     for(i = LEFTWALL; i <= RIGHTWALL; i++){
         for(j = BOTTOMWALL; j <= TOPWALL; j++){
-            world[i][FLOORHEIGHT][j] = 4;
+            world[i][FLOORHEIGHT][j] = CUBE_BLACK;
         }
     }
 
@@ -26,7 +27,7 @@ void buildStaticObjects(){
     for(i = LEFTWALL; i <= RIGHTWALL; i = i + ROOMSIZE + 1){
         for(j = BOTTOMWALL; j <= TOPWALL; j = j + ROOMSIZE + 1){
             for(k = 0; k <= WALL_HEIGHT; k++){
-                world[i][FLOORHEIGHT+k][j] = 2;
+                world[i][FLOORHEIGHT+k][j] = CUBE_BLUE;
             }
         }
     }
@@ -35,7 +36,7 @@ void buildStaticObjects(){
         for(i = LEFTWALL; i <= RIGHTWALL; i = i + ROOMSIZE + 5){
             for(j = BOTTOMWALL; j <= TOPWALL; j = j + ROOMSIZE + 1){
                 for(k = 1; k <= WALL_HEIGHT; k++){
-                    world[i][FLOORHEIGHT+k][j] = 3;
+                    world[i][FLOORHEIGHT+k][j] = CUBE_RED;
                 }
             }
         }
@@ -44,18 +45,39 @@ void buildStaticObjects(){
     /*Bottom and top borders*/
     for(i = LEFTWALL; i <= RIGHTWALL; i++){
         for(k = 1; k <= WALL_HEIGHT; k++){
-            world[i][FLOORHEIGHT+k][BOTTOMWALL] = 2;
-            world[i][FLOORHEIGHT+k][TOPWALL] = 2;
+            world[i][FLOORHEIGHT+k][BOTTOMWALL] = CUBE_BLUE;
+            world[i][FLOORHEIGHT+k][TOPWALL] = CUBE_BLUE;
         }
     }
 
     /*Left and right borders*/
     for(j = BOTTOMWALL; j <= TOPWALL; j++){
         for(k = 1; k <= WALL_HEIGHT; k++){
-            world[LEFTWALL][FLOORHEIGHT+k][j] = 2;
-            world[RIGHTWALL][FLOORHEIGHT+k][j] = 2;
+            world[LEFTWALL][FLOORHEIGHT+k][j] = CUBE_BLUE;
+            world[RIGHTWALL][FLOORHEIGHT+k][j] = CUBE_BLUE;
         }
     }
+
+    /*Place a key*/
+    generateValidMobPosition(&keyX, &keyY, &keyZ);
+    world[keyX][keyY - 1][keyZ] = CUBE_WHITE;
+
+    /*Place the door*/
+    world[LEFTWALL][FLOORHEIGHT + 1][BOTTOMWALL + 2] = CUBE_BLACK;
+    world[LEFTWALL][FLOORHEIGHT + 1][BOTTOMWALL + 3] = CUBE_WHITE;
+    world[LEFTWALL][FLOORHEIGHT + 1][BOTTOMWALL + 4] = CUBE_BLACK;
+
+    world[LEFTWALL][FLOORHEIGHT + 2][BOTTOMWALL + 2] = CUBE_BLACK;
+    world[LEFTWALL][FLOORHEIGHT + 2][BOTTOMWALL + 3] = CUBE_WHITE;
+    world[LEFTWALL][FLOORHEIGHT + 2][BOTTOMWALL + 4] = CUBE_BLACK;
+
+    world[LEFTWALL][FLOORHEIGHT + 3][BOTTOMWALL + 2] = CUBE_BLACK;
+    world[LEFTWALL][FLOORHEIGHT + 3][BOTTOMWALL + 3] = CUBE_BLACK;
+    world[LEFTWALL][FLOORHEIGHT + 3][BOTTOMWALL + 4] = CUBE_BLACK;
+
+    world[LEFTWALL][FLOORHEIGHT + WALL_HEIGHT][BOTTOMWALL + 2] = CUBE_WHITE;
+    world[LEFTWALL][FLOORHEIGHT + WALL_HEIGHT][BOTTOMWALL + 3] = CUBE_WHITE;
+    world[LEFTWALL][FLOORHEIGHT + WALL_HEIGHT][BOTTOMWALL + 4] = CUBE_WHITE;
 }
 
 

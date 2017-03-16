@@ -26,6 +26,18 @@ GLubyte  world[WORLDX][WORLDY][WORLDZ];
 /*2D UI constants for the minimap*/
 #define UI_MAP_BORDER_WIDTH 3
 
+
+/*Block colour constants for ease of access and readability*/
+#define CUBE_EMPTY 0
+#define CUBE_GREEN 1
+#define CUBE_BLUE 2
+#define CUBE_RED 3
+#define CUBE_BLACK 4
+#define CUBE_WHITE 5
+#define CUBE_PURPLE 6
+#define CUBE_ORANGE 7
+#define CUBE_YELLOW 8
+
 /*Map border calculation generalization:
   bottom = top of the screen - (size of the world in map blocks + downward screen shift)
   top = top of the screen - downward screen shift
