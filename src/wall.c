@@ -31,6 +31,16 @@ void buildStaticObjects(){
         }
     }
 
+    if(DEBUG_MODE){
+        for(i = LEFTWALL; i <= RIGHTWALL; i = i + ROOMSIZE + 5){
+            for(j = BOTTOMWALL; j <= TOPWALL; j = j + ROOMSIZE + 1){
+                for(k = 1; k <= WALL_HEIGHT; k++){
+                    world[i][FLOORHEIGHT+k][j] = 3;
+                }
+            }
+        }
+    }
+
     /*Bottom and top borders*/
     for(i = LEFTWALL; i <= RIGHTWALL; i++){
         for(k = 1; k <= WALL_HEIGHT; k++){
@@ -507,9 +517,9 @@ void deleteFromAnimationQueue(AnimationList * toDelete){
     else if(toDelete->prev == NULL){
         animationQueue = toDelete->next;
     }
-    else if(toDelete->next == NULL){
+    /*else if(toDelete->next == NULL){
         animationQueue = toDelete->prev;
-    }
+    }*/
 
     free(toDelete);
 }
