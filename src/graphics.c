@@ -332,6 +332,7 @@ void drawCube(int i, int j, int k) {
     static GLfloat orange[]   = {1.0, 0.64, 0.0, 1.0};
     static GLfloat white[] = {1.0, 1.0, 1.0, 1.0};
     static GLfloat black[] = {0.0, 0.0, 0.0, 1.0};
+    static GLfloat lightBlue[]  = {0.25, 0.85, 1.0, 1.0};
 
     static GLfloat dblue[]  = {0.0, 0.0, 0.5, 1.0};
     static GLfloat dred[]   = {0.5, 0.0, 0.0, 1.0};
@@ -339,6 +340,7 @@ void drawCube(int i, int j, int k) {
     static GLfloat dyellow[]   = {0.5, 0.5, 0.0, 1.0};
     static GLfloat dpurple[]   = {0.5, 0.0, 0.5, 1.0};
     static GLfloat dorange[]   = {0.5, 0.32, 0.0, 1.0};
+    static GLfloat dlightBlue[]  = {0.125, 0.425, 0.5, 1.0};
 
 
     /* select colour based on value in the world array */
@@ -370,10 +372,20 @@ void drawCube(int i, int j, int k) {
         glMaterialfv(GL_FRONT, GL_AMBIENT, dorange);
         glMaterialfv(GL_FRONT, GL_DIFFUSE, orange);
     }
-    else {
+    else if (world[i][j][k] == 8) {
         glMaterialfv(GL_FRONT, GL_AMBIENT, dyellow);
         glMaterialfv(GL_FRONT, GL_DIFFUSE, yellow);
     }
+    else if (world[i][j][k] == 9){
+        /*ADDED: Light blue.*/
+        glMaterialfv(GL_FRONT, GL_AMBIENT, dlightBlue);
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, lightBlue);
+    }
+    else{
+        glMaterialfv(GL_FRONT, GL_AMBIENT, dyellow);
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, yellow);
+    }
+
 
     glPushMatrix ();
     /* offset cubes by 0.5 so the centre of the */
@@ -722,6 +734,11 @@ void motion(int x, int y) {
     /* update current mouse movement but don't use to change the viewpoint*/
     oldx = x;
     oldy = y;
+
+    /*CHANGED: Warps the pointer back to the center.*/
+    if(CURSOR_MODE == 1){
+        glutWarpPointer(screenWidth / 2, screenHeight / 2);
+    }
 }
 
 /* responds to mouse movement when a button is not pressed */
@@ -730,6 +747,10 @@ void passivemotion(int x, int y) {
     mvy += ((float) x - oldx)/2;
     oldx = x;
     oldy = y;
+    /*CHANGED: Warps the pointer back to the center.*/
+    if(CURSOR_MODE == 1){
+        glutWarpPointer(screenWidth / 2, screenHeight / 2);
+    }
     glutPostRedisplay();
 }
 

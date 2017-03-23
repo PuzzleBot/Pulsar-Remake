@@ -21,6 +21,7 @@ GLubyte  world[WORLDX][WORLDY][WORLDZ];
 #define FPS_CAP 60
 
 #define DEBUG_MODE FALSE
+#define CURSOR_MODE 0
 
 
 /*2D UI constants for the minimap*/
@@ -37,6 +38,7 @@ GLubyte  world[WORLDX][WORLDY][WORLDZ];
 #define CUBE_PURPLE 6
 #define CUBE_ORANGE 7
 #define CUBE_YELLOW 8
+#define CUBE_LIGHTBLUE 9
 
 /*Map border calculation generalization:
   bottom = top of the screen - (size of the world in map blocks + downward screen shift)
@@ -123,6 +125,17 @@ GLubyte  world[WORLDX][WORLDY][WORLDZ];
 #define MOB_SPAWN 5
 
 
+/*Pickup control*/
+#define RED_PICKUPS 4
+#define GREEN_PICKUPS 4
+#define BLUE_PICKUPS 4
+
+#define STARFALL_BLOCKS 12
+#define STARFALL_LOWERBOUND (WORLDY - 10)
+#define STARFALL_UPPERBOUND (WORLDY - 2)
+
+
+
 typedef enum{FALSE, TRUE} Boolean;
 
 
@@ -148,7 +161,7 @@ typedef struct anim_list{
     /*Linked list*/
     struct anim_list * next;
     struct anim_list * prev;
-} AnimationList;
+} WallAnimationList;
 
 
 /*Data structure representing a bullet*/
@@ -217,6 +230,20 @@ typedef struct{
 } HighGrid;
 
 
+/*Falling blocks*/
+typedef struct animBlock{
+    double x_pos;
+    double y_pos;
+    double z_pos;
+
+    double y_velocity;
+
+    struct animBlock * next;
+    struct animBlock * prev;
+} Meteor;
+
+
+
 /* Wall functions */
 
 /*Builds all non-moving world parts, including the floor, pillars, and border*/
@@ -235,14 +262,14 @@ void toggleRandomWall();
 void toggleTwoWalls();
 
 /*Queues an animation to be done on the next processing cycle*/
-void addToAnimationQueue(WallState animationType, Boolean isXwall, int row, int col);
+void addToWallAnimationQueue(WallState animationType, Boolean isXwall, int row, int col);
 
 /*Perform one frame of each queued animation, removes the queued animation
   once it completes using the function below*/
-void processAllAnimations();
+void processAllWallAnimations();
 
 /*Removes an animation from the animation queue*/
-void deleteFromAnimationQueue(AnimationList * toDelete);
+void deleteFromWallAnimationQueue(WallAnimationList * toDelete);
 
 void printXWalls();
 void printZWalls();
@@ -284,7 +311,7 @@ void initializeBulletArray();
 Mob * createNewMob(MobType type, double x, double y, double z, int bulletArrayIndex);
 
 /*Generates a valid position for a mob to spawn in the game world*/
-void generateValidMobPosition(int * x, int * y, int * z);
+void generateValidSpawnPosition(int * x, int * y, int * z);
 
 /*Adds a mob to the front of a list of mobs*/
 Mob * mobAddToFront(Mob * mobList, Mob * newMob);
@@ -335,6 +362,9 @@ double dotProduct2D(double x1, double z1, double x2, double z2);
 /*Initializes the mobs in the world*/
 void worldMobInit();
 
+/*Move all mobs to random positions*/
+void randomizeAllMobPositions();
+
 
 /*Waypoint grid functions (unused, due to line of sight being more effective for navigation)*/
 
@@ -373,3 +403,15 @@ void handleSingleBlock(int * blockX, int * blockY, int * blockZ);
 void mazeDoor();
 
 void resetMaze();
+
+void generateAllPickups();
+
+void beginStarfall();
+
+Meteor * createNewMeteor();
+
+Meteor * addMeteorToList(Meteor * list, Meteor * new);
+
+Meteor * deleteMeteorFromList(Meteor * list, Meteor * toDelete);
+
+void destroyMeteorList(Meteor * list);

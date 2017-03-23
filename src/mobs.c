@@ -68,7 +68,7 @@ Mob * createNewMob(MobType type, double x, double y, double z, int bulletArrayIn
     return(newMob);
 }
 
-void generateValidMobPosition(int * x, int * y, int * z){
+void generateValidSpawnPosition(int * x, int * y, int * z){
     /*-2: Prevent the mob from spawning on the right of or above the outer border*/
     static int horizRange = RIGHTWALL - LEFTWALL - 3;
     static int vertRange = TOPWALL - BOTTOMWALL - 3;
@@ -84,7 +84,7 @@ void generateValidMobPosition(int * x, int * y, int * z){
         /*Prevent spawning in the starting cell unless it is the only one*/
         if(((randomX >= (RIGHTWALL - ROOMSIZE)) && (randomZ <= ROOMSIZE)) && (GRIDSIZE > 1)){
             /*Fix it by offsetting x and z to the northeast cell*/
-            randomX = randomX + (ROOMSIZE + 1);
+            randomX = randomX - (ROOMSIZE + 1);
             randomZ = randomZ + (ROOMSIZE + 1);
         }
 
@@ -167,7 +167,7 @@ Mob * generateRandomMobs(int count){
             }
         }
 
-        generateValidMobPosition(&mobX, &mobY, &mobZ);
+        generateValidSpawnPosition(&mobX, &mobY, &mobZ);
         newMobList = mobAddToFront(newMobList, createNewMob(chosenType, mobX, mobY, mobZ, i));
     }
 
@@ -775,5 +775,22 @@ void worldMobInit(){
     }
     else{
         mobList = generateRandomMobs(MOB_SPAWN);
+    }
+}
+
+
+void randomizeAllMobPositions(){
+    Mob * currentMob = mobList;
+    int x, y, z;
+
+    while(currentMob != NULL){
+        generateValidSpawnPosition(&x, &y, &z);
+        clearMobSpace((int)currentMob->x_pos, (int)currentMob->y_pos, (int)currentMob->z_pos);
+
+        currentMob->x_pos = x;
+        currentMob->y_pos = y;
+        currentMob->z_pos = z;
+
+        currentMob = currentMob->next;
     }
 }

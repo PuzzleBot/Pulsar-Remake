@@ -22,13 +22,15 @@ extern Bullet bulletArray[BULLET_ARRAY_SIZE];
 GLfloat blue[] = {0.0, 0.0, 1.0, 0.5};
 GLfloat purple[] = {1.0, 0.0, 1.0, 0.5};
 GLfloat black[] = {0.0, 0.0, 0.0, 0.5};
-GLfloat white[] = {1.0, 1.0, 1.0, 0.5};
+GLfloat white[] = {1.0, 1.0, 1.0, 1.0};
 
 /*Mob colours*/
-GLfloat red[]   = {1.0, 0.0, 0.0, 1.0};
-GLfloat green[] = {0.0, 1.0, 0.0, 1.0};
-GLfloat yellow[]   = {1.0, 1.0, 0.0, 1.0};
-GLfloat orange[]   = {1.0, 0.64, 0.0, 1.0};
+GLfloat red[]   = {1.0, 0.0, 0.0, 0.5};
+GLfloat green[] = {0.0, 1.0, 0.0, 0.5};
+GLfloat yellow[]   = {1.0, 1.0, 0.0, 0.5};
+GLfloat orange[]   = {1.0, 0.64, 0.0, 0.5};
+
+GLfloat lightBlue[]  = {0.25, 0.85, 1.0, 0.5};
 
 GLfloat borderColour[] = {0.0, 0.0, 0.0, 1.0};
 GLfloat playerColour[] = {1.0, 1.0, 0.0, 1.0};
@@ -154,6 +156,10 @@ void drawSmallMinimap(){
                             /*Orbiter core*/
                             set2Dcolour(yellow);
                             break;
+                        case 9:
+                            /*Light Blue*/
+                            set2Dcolour(lightBlue);
+                            break;
                         default:
                             /*Black*/
                             set2Dcolour(black);
@@ -168,6 +174,16 @@ void drawSmallMinimap(){
                               (currentSquareBottom),
                               (currentSquareLeft) + UI_SQUARE_DIM_HORIZ,
                               (currentSquareBottom) + UI_SQUARE_DIM_VERT);
+
+                    /*Key Highlight
+                    if((world[i][j][k] == 5) && (j <= FLOORHEIGHT+2)){
+                        set2Dcolour(yellow);
+                        draw2Dbox((currentSquareLeft - 2),
+                                (currentSquareBottom - 2),
+                                (currentSquareLeft) + UI_SQUARE_DIM_HORIZ + 4,
+                                (currentSquareBottom) + UI_SQUARE_DIM_VERT + 2);
+                        set2Dcolour(white);
+                    }*/
 
                     ui_Ybuffer[i][k] = currentBufferValue;
                 }
@@ -295,6 +311,10 @@ void drawFullMap(){
                             /*Orbiter core*/
                             set2Dcolour(yellow);
                             break;
+                        case 9:
+                            /*Light Blue*/
+                            set2Dcolour(lightBlue);
+                            break;
                         default:
                             /*Black*/
                             set2Dcolour(black);
@@ -309,6 +329,16 @@ void drawFullMap(){
                               (currentSquareBottom),
                               (currentSquareLeft) + UI_FULLSQUARE_DIM_HORIZ,
                               (currentSquareBottom) + UI_FULLSQUARE_DIM_VERT);
+
+                    /*Key Highlight
+                    if((world[i][j][k] == 5) && (j <= FLOORHEIGHT+2)){
+                        set2Dcolour(yellow);
+                        draw2Dbox((currentSquareLeft - 2),
+                                (currentSquareBottom - 2),
+                                (currentSquareLeft) + UI_SQUARE_DIM_HORIZ + 4,
+                                (currentSquareBottom) + UI_SQUARE_DIM_VERT + 4);
+                        set2Dcolour(white);
+                    }*/
 
                     ui_Ybuffer[i][k] = currentBufferValue;
                 }

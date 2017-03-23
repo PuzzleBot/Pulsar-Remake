@@ -3,7 +3,7 @@
 
 Wall z_walls[GRIDSIZE][GRIDSIZE-1];
 Wall x_walls[GRIDSIZE-1][GRIDSIZE];
-extern AnimationList * animationQueue;
+extern WallAnimationList * animationQueue;
 
 extern void setViewPosition(float, float, float);
 extern void getViewPosition(float *, float *, float *);
@@ -57,10 +57,6 @@ void buildStaticObjects(){
             world[RIGHTWALL][FLOORHEIGHT+k][j] = CUBE_BLUE;
         }
     }
-
-    /*Place a key*/
-    generateValidMobPosition(&keyX, &keyY, &keyZ);
-    world[keyX][keyY - 1][keyZ] = CUBE_WHITE;
 
     /*Place the door*/
     world[LEFTWALL][FLOORHEIGHT + 1][BOTTOMWALL + 2] = CUBE_BLACK;
@@ -162,11 +158,11 @@ void toggleRandomWall(){
                 toggleable = 1;
                 if(x_walls[chosenRow][chosenCol].state == OPEN){
                     /*Close an open wall*/
-                    addToAnimationQueue(CLOSING, 1, chosenRow, chosenCol);
+                    addToWallAnimationQueue(CLOSING, 1, chosenRow, chosenCol);
                 }
                 else{
                     /*Open a closed wall*/
-                    addToAnimationQueue(OPENING, 1, chosenRow, chosenCol);
+                    addToWallAnimationQueue(OPENING, 1, chosenRow, chosenCol);
                 }
             }
         }
@@ -182,11 +178,11 @@ void toggleRandomWall(){
                 toggleable = 1;
                 if(z_walls[chosenRow][chosenCol].state == OPEN){
                     /*Close an open wall*/
-                    addToAnimationQueue(CLOSING, 0, chosenRow, chosenCol);
+                    addToWallAnimationQueue(CLOSING, 0, chosenRow, chosenCol);
                 }
                 else{
                     /*Open a closed wall*/
-                    addToAnimationQueue(OPENING, 0, chosenRow, chosenCol);
+                    addToWallAnimationQueue(OPENING, 0, chosenRow, chosenCol);
                 }
             }
         }
@@ -216,7 +212,7 @@ void toggleTwoWalls(){
             else{
                 toggleable = 1;
                 /*Close an open wall*/
-                addToAnimationQueue(CLOSING, 1, chosenRow, chosenCol);
+                addToWallAnimationQueue(CLOSING, 1, chosenRow, chosenCol);
             }
         }
         else{
@@ -230,7 +226,7 @@ void toggleTwoWalls(){
             else{
                 toggleable = 1;
                 /*Close an open wall*/
-                addToAnimationQueue(CLOSING, 0, chosenRow, chosenCol);
+                addToWallAnimationQueue(CLOSING, 0, chosenRow, chosenCol);
 
             }
         }
@@ -253,7 +249,7 @@ void toggleTwoWalls(){
             else{
                 toggleable = 1;
                 /*Open a closed wall*/
-                addToAnimationQueue(OPENING, 1, chosenRow, chosenCol);
+                addToWallAnimationQueue(OPENING, 1, chosenRow, chosenCol);
             }
         }
         else{
@@ -267,7 +263,7 @@ void toggleTwoWalls(){
             else{
                 toggleable = 1;
                 /*Open a closed wall*/
-                addToAnimationQueue(OPENING, 0, chosenRow, chosenCol);
+                addToWallAnimationQueue(OPENING, 0, chosenRow, chosenCol);
             }
         }
     }
@@ -276,11 +272,11 @@ void toggleTwoWalls(){
 
 /*Adds a wall animation to the queue, to be executed on the subsequent updates until the animation
   has completed*/
-void addToAnimationQueue(WallState animationType, Boolean isXwall, int row, int col){
-    AnimationList * newAnimation = NULL;
-    AnimationList * backOfQueue;
+void addToWallAnimationQueue(WallState animationType, Boolean isXwall, int row, int col){
+    WallAnimationList * newAnimation = NULL;
+    WallAnimationList * backOfQueue;
 
-    newAnimation = malloc(sizeof(AnimationList));
+    newAnimation = malloc(sizeof(WallAnimationList));
     if(newAnimation != NULL){
         newAnimation->targetWallIndex[0] = row;
         newAnimation->targetWallIndex[1] = col;
@@ -325,9 +321,9 @@ void addToAnimationQueue(WallState animationType, Boolean isXwall, int row, int 
 }
 
 /*Execute one step of each animation that is queued*/
-void processAllAnimations(){
-    AnimationList * currentAnimation = animationQueue;
-    AnimationList * animBuffer;
+void processAllWallAnimations(){
+    WallAnimationList * currentAnimation = animationQueue;
+    WallAnimationList * animBuffer;
     int worldX;
     int worldZ;
     int animationComplete = 0;
@@ -512,14 +508,14 @@ void processAllAnimations(){
         currentAnimation = currentAnimation->next;
         if(animationComplete == 1){
             /*Remove completed animations from the queue*/
-            deleteFromAnimationQueue(animBuffer);
+            deleteFromWallAnimationQueue(animBuffer);
         }
     }
 }
 
 
 /*Deletes an animation from the animation queue.*/
-void deleteFromAnimationQueue(AnimationList * toDelete){
+void deleteFromWallAnimationQueue(WallAnimationList * toDelete){
     if(toDelete == NULL){
         return;
     }

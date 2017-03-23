@@ -89,7 +89,7 @@ extern Wall x_walls[GRIDSIZE-1][GRIDSIZE];
 int wallTimer = 0;
 int wallAnimationTimer = 0;
 int wallCount = STARTING_WALLS;
-AnimationList * animationQueue = NULL;
+WallAnimationList * animationQueue = NULL;
 
 
 /*Array of empty cells, walls between them, and pillars - basically a higher level grid of the play area*/
@@ -380,7 +380,7 @@ void update() {
             wallAnimationTimer++;
             if(wallAnimationTimer >= FPS_CAP/10){
                 wallAnimationTimer = 0;
-                processAllAnimations();
+                processAllWallAnimations();
             }
 
             /*Bullet movement*/
@@ -487,6 +487,10 @@ int main(int argc, char** argv)
 
         glutWarpPointer(512, 384);
         motion(512, 384);
+
+        if(CURSOR_MODE == 1){
+            glutSetCursor(GLUT_CURSOR_NONE);
+        }
 
 
         /*Debug line for viewing the world from the top, uncomment to use*/
