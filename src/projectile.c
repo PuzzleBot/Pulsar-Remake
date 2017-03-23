@@ -20,6 +20,8 @@ Bullet bulletArray[BULLET_ARRAY_SIZE];
 int bulletCount = 0;
 int nextBullet = 0;
 
+extern int playerInvincibilityTimer;
+
 /*Create a new bullet from the player*/
 void fireBulletFromPlayer(){
     float vpX, vpY, vpZ;
@@ -27,7 +29,7 @@ void fireBulletFromPlayer(){
 
     double bulletDirectionX, bulletDirectionY, bulletDirectionZ;
     double bulletDirectionLength;
-    static double playerBulletDisplacement = 1.0;
+    static double playerBulletDisplacement = 1.2;
     static double bulletVelocity = 0.2;
 
     /*Bullet limit*/
@@ -68,7 +70,7 @@ void fireBulletFromPlayer(){
         bulletDirectionY = bulletDirectionY / bulletDirectionLength;
         bulletDirectionZ = bulletDirectionZ / bulletDirectionLength;
 
-        //printf("Firing bullet: %.2f, %.2f, %.2f\n", bulletDirectionX, bulletDirectionY, bulletDirectionZ);
+        //printf("Direction: %.2f, %.2f, %.2f\n", bulletDirectionX, bulletDirectionY, bulletDirectionZ);
 
 
         bulletArray[nextBullet].x_pos = vpX + (bulletDirectionX * playerBulletDisplacement);
@@ -79,7 +81,8 @@ void fireBulletFromPlayer(){
         bulletArray[nextBullet].y_velocity = (bulletDirectionY * bulletVelocity);
         bulletArray[nextBullet].z_velocity = (bulletDirectionZ * bulletVelocity);
 
-        //printf("Firing bullet: %.2f, %.2f, %.2f\n", bulletArray[nextBullet].x_velocity, bulletArray[nextBullet].y_velocity, bulletArray[nextBullet].z_velocity);
+        //printf("Firing bullet: %.2f, %.2f, %.2f\n", bulletArray[nextBullet].x_pos, bulletArray[nextBullet].y_pos, bulletArray[nextBullet].z_pos);
+        //printf("Player position: %.2f, %.2f, %.2f\n", vpX, vpY, vpZ);
         createMob(nextBullet, (float)bulletArray[nextBullet].x_pos, (float)bulletArray[nextBullet].y_pos, (float)bulletArray[nextBullet].z_pos, vpOrientY);
 
 
@@ -133,6 +136,7 @@ void moveAllBullets(){
 
 void bulletCollision(int bulletId){
     int blockX, blockY, blockZ;
+    double playerBulletDistance = 0;
 
     blockX = floor(bulletArray[bulletId].x_pos + 0.5);
     blockY = floor(bulletArray[bulletId].y_pos + 0.5);
@@ -142,35 +146,50 @@ void bulletCollision(int bulletId){
         /*Collision happened - remove the bullet, if it hits a wall, break it*/
         removeBullet(bulletId);
 
-        if(world[blockX][blockY][blockZ] == 6){
+        if(world[blockX][blockY][blockZ] == CUBE_PURPLE || world[blockX][blockY][blockZ] == CUBE_METEOR){
             world[blockX][blockY][blockZ] = 0;
 
-            if(world[blockX][blockY+1][blockZ] == 6){
+            if(world[blockX][blockY+1][blockZ] == CUBE_PURPLE || world[blockX][blockY+1][blockZ] == CUBE_METEOR){
                 world[blockX][blockY+1][blockZ] = 0;
             }
 
-            if(world[blockX][blockY-1][blockZ] == 6){
+            if(world[blockX][blockY-1][blockZ] == CUBE_PURPLE || world[blockX][blockY-1][blockZ] == CUBE_METEOR){
                 world[blockX][blockY-1][blockZ] = 0;
             }
 
-            if(world[blockX+1][blockY][blockZ] == 6){
+            if(world[blockX+1][blockY][blockZ] == CUBE_PURPLE || world[blockX+1][blockY][blockZ] == CUBE_METEOR){
                 world[blockX+1][blockY][blockZ] = 0;
             }
 
-            if(world[blockX-1][blockY][blockZ] == 6){
+            if(world[blockX-1][blockY][blockZ] == CUBE_PURPLE || world[blockX-1][blockY][blockZ] == CUBE_METEOR){
                 world[blockX-1][blockY][blockZ] = 0;
             }
 
-            if(world[blockX][blockY][blockZ+1] == 6){
+            if(world[blockX][blockY][blockZ+1] == CUBE_PURPLE || world[blockX][blockY][blockZ+1] == CUBE_METEOR){
                 world[blockX][blockY][blockZ+1] = 0;
             }
 
-            if(world[blockX][blockY][blockZ-1] == 6){
+            if(world[blockX][blockY][blockZ-1] == CUBE_PURPLE || world[blockX][blockY][blockZ-1] == CUBE_METEOR){
                 world[blockX][blockY][blockZ-1] = 0;
             }
         }
     }
     else{
+        float vpX, vpY, vpZ;
+        getViewPosition(&vpX, &vpY, &vpZ);
+        vpX = -vpX;
+        vpY = -vpY;
+        vpZ = -vpZ;
+
+        /*Check if a mob bullet's core hits the player's hitbox (radius 1 sphere), if the player isn't invincible*/
+        if((bulletId >= MOB_BULLET_ARRAY_START) && (playerInvincibilityTimer <= 0)){
+            playerBulletDistance = sqrt(pow((bulletArray[bulletId].x_pos + 0.5) - vpX, 2) + pow((bulletArray[bulletId].y_pos + 0.5) - vpY, 2) + pow((bulletArray[bulletId].z_pos + 0.5) - vpZ, 2));
+            if(playerBulletDistance <= 1.0){
+                playerInvincibilityTimer = INVINICIBILITY_FRAMES;
+                printf("I'm Hit! (You cannot get hit again within the next half second)\n");
+            }
+        }
+        //printf("Dist: %.2f\n", playerBulletDistance);
         setMobPosition(bulletId, bulletArray[bulletId].x_pos, bulletArray[bulletId].y_pos, bulletArray[bulletId].z_pos, bulletArray[bulletId].yOrientation);
     }
 }

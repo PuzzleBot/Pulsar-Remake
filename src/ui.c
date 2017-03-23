@@ -18,6 +18,12 @@ extern Boolean playerHasKey;
 
 extern Bullet bulletArray[BULLET_ARRAY_SIZE];
 
+extern int playerInvincibilityTimer;
+
+
+/*For tracking the transparency of the hit indicator*/
+
+
 /*Wall and floor colours*/
 GLfloat blue[] = {0.0, 0.0, 1.0, 0.5};
 GLfloat purple[] = {1.0, 0.0, 1.0, 0.5};
@@ -35,6 +41,9 @@ GLfloat lightBlue[]  = {0.25, 0.85, 1.0, 0.5};
 GLfloat borderColour[] = {0.0, 0.0, 0.0, 1.0};
 GLfloat playerColour[] = {1.0, 1.0, 0.0, 1.0};
 GLfloat bulletColour[] = {0.0, 1.0, 1.0, 1.0};
+
+GLfloat transparentColour[] = {0.0, 0.0, 0.0, 0.0};
+GLfloat hitIndicatorColour[] = {1.0, 0.0, 0.0, 0.0};
 
 void drawSmallMinimap(){
     float vpX, vpY, vpZ;
@@ -80,7 +89,7 @@ void drawSmallMinimap(){
     /*Draw projectiles*/
     for(i = 0; i < BULLET_ARRAY_SIZE; i++){
         if(bulletArray[i].existsInWorld == 1){
-            bulletSquareLeft = UI_MAP_RIGHT - (bulletArray[i].x_pos - LEFTWALL + 1)*UI_SQUARE_DIM_HORIZ;
+            bulletSquareLeft = UI_MAP_RIGHT - (bulletArray[i].x_pos - LEFTWALL - 0)*UI_SQUARE_DIM_HORIZ;
             bulletSquareBottom = UI_MAP_BOTTOM + (bulletArray[i].z_pos - BOTTOMWALL)*UI_SQUARE_DIM_VERT;
 
             set2Dcolour(bulletColour);
@@ -223,7 +232,7 @@ void drawFullMap(){
     vpY = -vpY;
     vpZ = -vpZ;
 
-    playerSquareLeft = UI_FULLMAP_RIGHT - (vpX - LEFTWALL)*UI_FULLSQUARE_DIM_HORIZ;
+    playerSquareLeft = UI_FULLMAP_RIGHT - (vpX - LEFTWALL - 1)*UI_FULLSQUARE_DIM_HORIZ;
     playerSquareBottom = UI_FULLMAP_BOTTOM + (vpZ - BOTTOMWALL)*UI_FULLSQUARE_DIM_VERT;
 
     set2Dcolour(playerColour);
@@ -236,8 +245,8 @@ void drawFullMap(){
     /*Draw projectiles*/
     for(i = 0; i < BULLET_ARRAY_SIZE; i++){
         if(bulletArray[i].existsInWorld == 1){
-            bulletSquareLeft = UI_FULLMAP_RIGHT - (bulletArray[i].x_pos - LEFTWALL + 1)*UI_FULLSQUARE_DIM_HORIZ;
-            bulletSquareBottom = UI_FULLMAP_BOTTOM + (bulletArray[i].z_pos - BOTTOMWALL)*UI_FULLSQUARE_DIM_VERT;
+            bulletSquareLeft = UI_FULLMAP_RIGHT - (bulletArray[i].x_pos - LEFTWALL - 1)*UI_FULLSQUARE_DIM_HORIZ;
+            bulletSquareBottom = UI_FULLMAP_BOTTOM + (bulletArray[i].z_pos - BOTTOMWALL + 1)*UI_FULLSQUARE_DIM_VERT;
 
             set2Dcolour(bulletColour);
             draw2Dbox(bulletSquareLeft,
@@ -322,7 +331,7 @@ void drawFullMap(){
                     }
 
                     /*Draw from right to left, bottom to top*/
-                    currentSquareLeft = UI_FULLMAP_RIGHT - (i - LEFTWALL + 1)*UI_FULLSQUARE_DIM_HORIZ;
+                    currentSquareLeft = UI_FULLMAP_RIGHT - (i - LEFTWALL)*UI_FULLSQUARE_DIM_HORIZ;
                     currentSquareBottom = UI_FULLMAP_BOTTOM + (k - BOTTOMWALL)*UI_FULLSQUARE_DIM_VERT;
 
                     draw2Dbox((currentSquareLeft),
@@ -375,4 +384,17 @@ void drawGameplayUI(){
     set2Dcolour(black);
     draw2Dbox(UI_KEY_BOX_LEFT, UI_KEY_BOX_BOTTOM, UI_KEY_BOX_RIGHT, UI_KEY_BOX_TOP);
 
+    /*Draw hit indicator*/
+    hitIndicatorColour[3] = 0.5 - (0.5 / ((float)playerInvincibilityTimer + 1.0));
+    set2Dcolour(transparentColour);
+    draw2Dbox((screenWidth / 10) * 3,
+              (screenHeight / 10) * 3,
+              (screenWidth / 10) * 7,
+              (screenHeight / 10) * 7);
+
+    set2Dcolour(hitIndicatorColour);
+    draw2Dbox((screenWidth / 10) * 2,
+              (screenHeight / 10) * 2,
+              (screenWidth / 10) * 8,
+              (screenHeight / 10) * 8);
 }

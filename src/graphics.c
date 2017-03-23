@@ -381,6 +381,10 @@ void drawCube(int i, int j, int k) {
         glMaterialfv(GL_FRONT, GL_AMBIENT, dlightBlue);
         glMaterialfv(GL_FRONT, GL_DIFFUSE, lightBlue);
     }
+    else if (world[i][j][k] == 10) {
+        /*ADDED: Meteor*/
+        glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, black);
+    }
     else{
         glMaterialfv(GL_FRONT, GL_AMBIENT, dyellow);
         glMaterialfv(GL_FRONT, GL_DIFFUSE, yellow);

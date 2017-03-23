@@ -39,6 +39,7 @@ GLubyte  world[WORLDX][WORLDY][WORLDZ];
 #define CUBE_ORANGE 7
 #define CUBE_YELLOW 8
 #define CUBE_LIGHTBLUE 9
+#define CUBE_METEOR 10
 
 /*Map border calculation generalization:
   bottom = top of the screen - (size of the world in map blocks + downward screen shift)
@@ -124,6 +125,8 @@ GLubyte  world[WORLDX][WORLDY][WORLDZ];
 #define MOB_MOVEMENT_SPEED 0.40
 #define MOB_SPAWN 5
 
+
+#define INVINICIBILITY_FRAMES 30
 
 /*Pickup control*/
 #define RED_PICKUPS 4
@@ -232,11 +235,12 @@ typedef struct{
 
 /*Falling blocks*/
 typedef struct animBlock{
-    double x_pos;
     double y_pos;
-    double z_pos;
-
     double y_velocity;
+
+    int x_block;
+    int y_block;
+    int z_block;
 
     struct animBlock * next;
     struct animBlock * prev;
@@ -398,7 +402,7 @@ Boolean lineIsClear(double startX, double startY, double startZ, double endX, do
 
 /*Gameplay-related functions*/
 
-void handleSingleBlock(int * blockX, int * blockY, int * blockZ);
+void handleSingleBlock(int * blockX, float * newY, int * blockZ);
 
 void mazeDoor();
 
@@ -415,3 +419,5 @@ Meteor * addMeteorToList(Meteor * list, Meteor * new);
 Meteor * deleteMeteorFromList(Meteor * list, Meteor * toDelete);
 
 void destroyMeteorList(Meteor * list);
+
+Meteor * animateAllMeteors(Meteor * meteorList);

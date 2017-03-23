@@ -100,8 +100,11 @@ extern HighGrid waypointGrid[(GRIDSIZE * 2) + 1][(GRIDSIZE * 2) + 1];
 extern Mob * mobList;
 int mobTimer = 0;
 
+extern Meteor * meteorList;
+int meteorAnimationTimer = 0;
 
 Boolean playerHasKey = FALSE;
+int playerInvincibilityTimer = 0;
 
 /*** collisionResponse() ***/
 /* -performs collision detection and response */
@@ -159,7 +162,7 @@ void collisionResponse() {
         if(newBlockZ < oldBlockZ){
             /*Climb 1-block high walls*/
             if((world[newBlockX][newBlockY+1][newBlockZ] == 0) && (world[newBlockX][newBlockY+2][newBlockZ] == 0) && (world[newBlockX][newBlockY][newBlockZ] != 0)){
-                handleSingleBlock(&newBlockX, &newBlockY, &newBlockZ);
+                handleSingleBlock(&newBlockX, &newY, &newBlockZ);
             }
             else{
                 /*North side detection*/
@@ -170,7 +173,7 @@ void collisionResponse() {
         else if(newBlockZ > oldBlockZ){
             /*Climb 1-block high walls*/
             if((world[newBlockX][newBlockY+1][newBlockZ] == 0) && (world[newBlockX][newBlockY+2][newBlockZ] == 0) && (world[newBlockX][newBlockY][newBlockZ] != 0)){
-                handleSingleBlock(&newBlockX, &newBlockY, &newBlockZ);
+                handleSingleBlock(&newBlockX, &newY, &newBlockZ);
             }
             else{
                 /*South side detection*/
@@ -182,7 +185,7 @@ void collisionResponse() {
         if(newBlockX < oldBlockX){
             /*Climb 1-block high walls*/
             if((world[newBlockX][newBlockY+1][newBlockZ] == 0) && (world[newBlockX][newBlockY+2][newBlockZ] == 0) && (world[newBlockX][newBlockY][newBlockZ] != 0)){
-                handleSingleBlock(&newBlockX, &newBlockY, &newBlockZ);
+                handleSingleBlock(&newBlockX, &newY, &newBlockZ);
             }
             else{
                 /*Right side detection*/
@@ -193,7 +196,7 @@ void collisionResponse() {
         else if(newBlockX > oldBlockX){
             /*Climb 1-block high walls*/
             if((world[newBlockX][newBlockY+1][newBlockZ] == 0) && (world[newBlockX][newBlockY+2][newBlockZ] == 0) && (world[newBlockX][newBlockY][newBlockZ] != 0)){
-                handleSingleBlock(&newBlockX, &newBlockY, &newBlockZ);
+                handleSingleBlock(&newBlockX, &newY, &newBlockZ);
             }
             else{
                 /*Left side detection*/
@@ -377,14 +380,26 @@ void update() {
                 animateAllMobs(mobList);
             }
 
+            /*Wall animation*/
             wallAnimationTimer++;
             if(wallAnimationTimer >= FPS_CAP/10){
                 wallAnimationTimer = 0;
                 processAllWallAnimations();
             }
 
+
+            meteorAnimationTimer++;
+            if(meteorAnimationTimer >= FPS_CAP/15){
+                meteorAnimationTimer = 0;
+                meteorList = animateAllMeteors(meteorList);
+            }
+
             /*Bullet movement*/
             moveAllBullets();
+
+            if(playerInvincibilityTimer > 0){
+                playerInvincibilityTimer--;
+            }
 
             glutPostRedisplay();
             gettimeofday(&previousUpdate, NULL);

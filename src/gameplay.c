@@ -11,31 +11,31 @@ extern Boolean playerHasKey;
 Meteor * meteorList = NULL;
 
 /*For handling pickups and keys on the ground*/
-void handleSingleBlock(int * blockX, int * blockY, int * blockZ){
-    switch(world[*blockX][*blockY][*blockZ]){
+void handleSingleBlock(int * blockX, float * newY, int * blockZ){
+    switch(world[*blockX][(int)*newY][*blockZ]){
         case CUBE_WHITE:
             /*Key*/
             playerHasKey = TRUE;
             printf("Key get!\n");
-            world[*blockX][*blockY][*blockZ] = CUBE_EMPTY;
+            world[*blockX][(int)*newY][*blockZ] = CUBE_EMPTY;
             break;
         case CUBE_RED:
             /*Random Teleport*/
             randomizeAllMobPositions();
-            world[*blockX][*blockY][*blockZ] = CUBE_EMPTY;
+            world[*blockX][(int)*newY][*blockZ] = CUBE_EMPTY;
             break;
         case CUBE_GREEN:
             /*Bounce*/
-            world[*blockX][*blockY][*blockZ] = CUBE_EMPTY;
+            world[*blockX][(int)*newY][*blockZ] = CUBE_EMPTY;
             break;
         case CUBE_LIGHTBLUE:
             /*Meteors*/
             beginStarfall();
-            world[*blockX][*blockY][*blockZ] = CUBE_EMPTY;
+            world[*blockX][(int)*newY][*blockZ] = CUBE_EMPTY;
             break;
         default:
             /*Nothing special, just step on top of the block*/
-            *blockY = *blockY + 1;
+            *newY = *newY + 1;
             break;
     }
 }
@@ -73,6 +73,7 @@ void resetMaze(){
     initWaypointGrid();
     initializeBulletArray();
     worldMobInit();
+    destroyMeteorList(meteorList);
 
     generateAllPickups();
 
@@ -118,16 +119,15 @@ void beginStarfall(){
 
 Meteor * createNewMeteor(){
     Meteor * newMeteor = calloc(1, sizeof(Meteor));
-    int x, y, z;
+    int y;
     if(newMeteor == NULL){
         printf("Not enough memory!\n");
         exit(1);
     }
 
-    generateValidSpawnPosition(&x, &y, &z);
-    newMeteor->x_pos = x;
+    generateValidSpawnPosition(&newMeteor->x_block, &y, &newMeteor->z_block);
     newMeteor->y_pos = (rand() % (STARFALL_UPPERBOUND - STARFALL_LOWERBOUND)) + STARFALL_LOWERBOUND;
-    newMeteor->z_pos = z;
+    newMeteor->y_block = (int)newMeteor->y_pos;
     newMeteor->y_velocity = -(GRAVITY * 2);
     newMeteor->next = NULL;
     newMeteor->prev = NULL;
@@ -137,7 +137,10 @@ Meteor * createNewMeteor(){
 
 Meteor * addMeteorToList(Meteor * list, Meteor * new){
     new->next = list;
-    list->prev = new;
+
+    if(list != NULL){
+        list->prev = new;
+    }
     return(new);
 }
 
@@ -163,8 +166,48 @@ Meteor * deleteMeteorFromList(Meteor * list, Meteor * toDelete){
 void destroyMeteorList(Meteor * list){
     Meteor * currentMeteor = list;
     while(currentMeteor != NULL){
+        world[currentMeteor->x_block][currentMeteor->y_block][currentMeteor->z_block] = CUBE_EMPTY;
         currentMeteor = currentMeteor->next;
         free(list);
         list = currentMeteor;
     }
+}
+
+
+Meteor * animateAllMeteors(Meteor * meteorList){
+    Meteor * currentMeteor = meteorList;
+
+    while(currentMeteor != NULL){
+        world[currentMeteor->x_block][currentMeteor->y_block][currentMeteor->z_block] = CUBE_EMPTY;
+        currentMeteor->y_pos = currentMeteor->y_pos + currentMeteor->y_velocity;
+        currentMeteor->y_block = (int)currentMeteor->y_pos;
+        if(world[currentMeteor->x_block][currentMeteor->y_block][currentMeteor->z_block] != CUBE_EMPTY){
+            if(world[currentMeteor->x_block][currentMeteor->y_block][currentMeteor->z_block] == CUBE_BLACK
+               || world[currentMeteor->x_block][currentMeteor->y_block][currentMeteor->z_block] == CUBE_METEOR){
+                /*The meteor has reached the ground*/
+                currentMeteor->y_pos = currentMeteor->y_pos - (currentMeteor->y_velocity * 1.001);
+                currentMeteor->y_block = (int)currentMeteor->y_pos;
+                world[currentMeteor->x_block][currentMeteor->y_block][currentMeteor->z_block] = CUBE_METEOR;
+                meteorList = deleteMeteorFromList(meteorList, currentMeteor);
+            }
+            else{
+                /*Something is in the way, but won't be for long, don't move*/
+                currentMeteor->y_pos = currentMeteor->y_pos - (currentMeteor->y_velocity * 1.001);
+                currentMeteor->y_block = (int)currentMeteor->y_pos;
+                world[currentMeteor->x_block][currentMeteor->y_block][currentMeteor->z_block] = CUBE_METEOR;
+            }
+        }
+        else{
+            world[currentMeteor->x_block][currentMeteor->y_block][currentMeteor->z_block] = CUBE_METEOR;
+        }
+
+        currentMeteor = currentMeteor->next;
+    }
+
+    return(meteorList);
+}
+
+
+void initiateBounce(){
+    /*Fancy scenic teleport intitated by an aerial faith plate*/
 }
