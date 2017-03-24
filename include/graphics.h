@@ -133,6 +133,8 @@ GLubyte  world[WORLDX][WORLDY][WORLDZ];
 #define GREEN_PICKUPS 4
 #define BLUE_PICKUPS 4
 
+#define BOUNCE_HEIGHT 30
+
 #define STARFALL_BLOCKS 12
 #define STARFALL_LOWERBOUND (WORLDY - 10)
 #define STARFALL_UPPERBOUND (WORLDY - 2)
@@ -183,6 +185,7 @@ typedef struct{
     int lifeTimer;
 } Bullet;
 
+typedef enum{WALKING, FLYING} PlayerState;
 
 /*Mob structures*/
 typedef enum{ROAMING, DODGING} MobState;
@@ -231,6 +234,20 @@ typedef struct{
     HighGridType type;
     Wall * correspondingWall;
 } HighGrid;
+
+/*Launch parabola*/
+typedef struct{
+    double xzDistance;
+    double vertexHeight;
+
+    double x_start;
+    double y_start;
+    double z_start;
+
+    double x_end;
+    double y_end;
+    double z_end;
+} Parabola;
 
 
 /*Falling blocks*/

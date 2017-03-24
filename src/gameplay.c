@@ -23,15 +23,18 @@ void handleSingleBlock(int * blockX, float * newY, int * blockZ){
             /*Random Teleport*/
             randomizeAllMobPositions();
             world[*blockX][(int)*newY][*blockZ] = CUBE_EMPTY;
+            //*newY = *newY + 1;
             break;
         case CUBE_GREEN:
             /*Bounce*/
             world[*blockX][(int)*newY][*blockZ] = CUBE_EMPTY;
+            //*newY = *newY + 1;
             break;
         case CUBE_LIGHTBLUE:
             /*Meteors*/
             beginStarfall();
             world[*blockX][(int)*newY][*blockZ] = CUBE_EMPTY;
+            //*newY = *newY + 1;
             break;
         default:
             /*Nothing special, just step on top of the block*/
@@ -74,6 +77,7 @@ void resetMaze(){
     initializeBulletArray();
     worldMobInit();
     destroyMeteorList(meteorList);
+    meteorList = NULL;
 
     generateAllPickups();
 
@@ -108,7 +112,8 @@ void generateAllPickups(){
     }
 }
 
-/*Drop blocks randomly*/
+/*Meteor functions start here
+  Drop blocks randomly*/
 void beginStarfall(){
     int i;
 
@@ -208,6 +213,12 @@ Meteor * animateAllMeteors(Meteor * meteorList){
 }
 
 
+/*Bounce functions start here*/
 void initiateBounce(){
-    /*Fancy scenic teleport intitated by an aerial faith plate*/
+    /*Fancy scenic teleport intitated by an aerial faith plate
+      (in Layman's terms: "Bouncy thing make player go to other place")
+    */
+
+    /*y = (-((u - (PARABOLA_WIDTH))^2)) + BOUNCE_HEIGHT
+      u is the horizontal (x and z combined) distance travelled from point a to b*/
 }

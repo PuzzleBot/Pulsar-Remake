@@ -217,5 +217,7 @@ void initializeBulletArray(){
 
         bulletArray[i].existsInWorld = 0;
         bulletArray[i].lifeTimer = 1500;
+
+        hideMob(i);
     }
 }

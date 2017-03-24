@@ -103,8 +103,10 @@ int mobTimer = 0;
 extern Meteor * meteorList;
 int meteorAnimationTimer = 0;
 
+/*Player state variables*/
 Boolean playerHasKey = FALSE;
 int playerInvincibilityTimer = 0;
+PlayerState playerState = WALKING;
 
 /*** collisionResponse() ***/
 /* -performs collision detection and response */
