@@ -2,7 +2,7 @@ Brandon Tan
 0845538
 
 CIS 4820
-Assignment 3
+Assignment 4
 ------------------------
 
 -----------------
@@ -27,7 +27,14 @@ src/                - Holds all source code (.c files)
                       and their AI
     sight.c         - Holds all functions regarding determining line of sight
     world.c (unused)- Holds functions used to manage a higher level view of
-                      the world, called a waypoint grid
+                      the world, called a waypoint grid.
+
+    gameplay.c      - Has functions specific to gameplay - event cubes, keys,
+                      and the exit door.
+    parabola.c      - Contains functions which are used to calculate the
+                      player's trajectory as they are flung into the air,
+                      using a constructed quadratic polynomial.
+                      
 
 test/               - Contains files used to unit test parts of the program.
                       (ignore this)
@@ -40,17 +47,14 @@ Compiling and Running the program
 To compile the program, type "make" into the terminal while
 in the directory that this readme is located in.
 
-After compiling, type either "./a3" or "make run" to run the program.
+After compiling, type either "./a4" or "make run" to run the program.
 
 
 ----------------------
 Program Details
 ----------------------
 
-All of the required features have been implemented. Two walls move each second,
-always with one wall opening and another closing each time, in order to keep
-the number of walls existing in the maze at a time somewhat constant, and to 
-reduce the chance of the player getting stuck for a long period of time.
+All of the required features have been implemented.
 
 The initial walls which may move are placed at each location with an equal
 probability. Since you can break the moving walls using shots, getting stuck
@@ -67,6 +71,21 @@ player is looking.
 Mobs won't try to move through walls (and will change their path if a wall cuts
 them off), but if a wall closes on a mob, the wall will just open itself again
 before colliding with the mob.
+
+
+Event cubes and the key disappear when touched, as if they are one-time consumables.
+
+
+
+-------------------------
+Additional Features
+-------------------------
+
+The UI has been improved beyond the required specifications.
+The UI shows a box which contains the key below the minimap when the key has 
+been picked up.
+It also shows a hollowed red box on the screen when the player is hit, and
+dissipates as the player's invincibility frames after being hit fade away.
 
 
 -----------------
@@ -89,10 +108,7 @@ world border.
 
 Shooting straight up or down has weird results.
 
-The game can very rarely crash in the event that a bunch of mobs try to move to
-the exact same location and just end up trying to sidestep around each other
-infinitely. It doesn't happen with 5 mobs in the game at once (I think) 
-but does happen with 30 mobs in the game.
+
 
 
 
