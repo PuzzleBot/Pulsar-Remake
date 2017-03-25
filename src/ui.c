@@ -137,6 +137,10 @@ void drawSmallMinimap(){
                 if((world[i][j][k] != 0) && (ui_Ybuffer[i][k] < currentBufferValue)){
                     /*Select a colour to match the world's cube colour*/
                     switch(world[i][j][k]){
+                        case 1:
+                            /*Blue*/
+                            set2Dcolour(green);
+                            break;
                         case 2:
                             /*Blue*/
                             set2Dcolour(blue);
@@ -292,6 +296,10 @@ void drawFullMap(){
                 if((world[i][j][k] != 0) && (ui_Ybuffer[i][k] < currentBufferValue)){
                     /*Select a colour to match the world's cube colour*/
                     switch(world[i][j][k]){
+                        case 1:
+                            /*Blue*/
+                            set2Dcolour(green);
+                            break;
                         case 2:
                             /*Blue*/
                             set2Dcolour(blue);

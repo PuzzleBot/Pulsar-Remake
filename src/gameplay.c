@@ -5,10 +5,14 @@ extern Wall x_walls[GRIDSIZE-1][GRIDSIZE];
 
 extern Mob * mobList;
 
+extern void getViewPosition(float *, float *, float *);
 extern void setViewPosition(float, float, float);
 extern Boolean playerHasKey;
 
 Meteor * meteorList = NULL;
+
+extern PlayerState playerState;
+extern Parabola playerLaunchTrajectory;
 
 /*For handling pickups and keys on the ground*/
 void handleSingleBlock(int * blockX, float * newY, int * blockZ){
@@ -27,6 +31,7 @@ void handleSingleBlock(int * blockX, float * newY, int * blockZ){
             break;
         case CUBE_GREEN:
             /*Bounce*/
+            initiateBounce();
             world[*blockX][(int)*newY][*blockZ] = CUBE_EMPTY;
             //*newY = *newY + 1;
             break;
@@ -216,9 +221,38 @@ Meteor * animateAllMeteors(Meteor * meteorList){
 /*Bounce functions start here*/
 void initiateBounce(){
     /*Fancy scenic teleport intitated by an aerial faith plate
-      (in Layman's terms: "Bouncy thing make player go to other place")
-    */
+      (in Layman's terms: "Bouncy thing make thing go to other place")
 
-    /*y = (-((u - (PARABOLA_WIDTH))^2)) + BOUNCE_HEIGHT
-      u is the horizontal (x and z combined) distance travelled from point a to b*/
+      y = (-((u - (PARABOLA_XZ_DISTANCE))^2)) + BOUNCE_HEIGHT
+      u is the horizontal (x and z combined) distance travelled from point a to b
+    */
+    int xDest, yDest, zDest;
+    float vpX, vpY, vpZ;
+
+    generateValidSpawnPosition(&xDest, &yDest, &zDest);
+    getViewPosition(&vpX, &vpY, &vpZ);
+
+    vpX = -vpX;
+    vpY = -vpY;
+    vpZ = -vpZ;
+
+    playerState = FLYING;
+    playerLaunchTrajectory = createParabola((double)vpX, (double)vpY, (double)vpZ, xDest, yDest, zDest, BOUNCE_HEIGHT);
+    printf("dist: %.2f,  pos: %.2f, %.2f, %.2f\n", playerLaunchTrajectory.xzDistance, vpX, vpY, vpZ);
+}
+
+
+void iterateBounceMovement(){
+    float vpX, vpY, vpZ;
+
+    if(playerLaunchTrajectory.currentTotalStepLength <= playerLaunchTrajectory.xzDistance - 0.03){
+        vpY = (float)-(parabolaStep(&playerLaunchTrajectory, FLYING_SPEED));
+        vpX = (float)-(playerLaunchTrajectory.x_start + ((playerLaunchTrajectory.x_end - playerLaunchTrajectory.x_start) * (playerLaunchTrajectory.currentTotalStepLength / playerLaunchTrajectory.xzDistance)));
+        vpZ = (float)-(playerLaunchTrajectory.z_start + ((playerLaunchTrajectory.z_end - playerLaunchTrajectory.z_start) * (playerLaunchTrajectory.currentTotalStepLength / playerLaunchTrajectory.xzDistance)));
+        setViewPosition(vpX, vpY, vpZ);
+        printf("dist: %.2f,  pos: %.2f, %.2f, %.2f\n", playerLaunchTrajectory.xzDistance, vpX, vpY, vpZ);
+    }
+    else{
+        playerState = WALKING;
+    }
 }

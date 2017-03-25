@@ -81,6 +81,9 @@ void  draw2Dbox(int, int, int, int);
 void  draw2Dtriangle(int, int, int, int, int, int);
 void  set2Dcolour(float []);
 
+
+extern PlayerState playerState;
+
 /***************/
 
 
@@ -458,9 +461,11 @@ void display (void)
     glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, skyblue);
     glPushMatrix ();
     /* move the sky cube center to middle of world space */
-    glTranslatef((float)WORLDX/2.0, (float)WORLDY/2.0, (float)WORLDZ/2.0);
+    /*CHANGED: Solid sphere instead of cube, translates to player position instead*/
+    //glTranslatef((float)WORLDX/2.0, (float)WORLDY/2.0, (float)WORLDZ/2.0);
+    glTranslatef(-vpx, -vpy, -vpz);
     //glutSolidCube(150.0);
-    glutSolidCube(skySize);
+    glutSolidSphere(skySize, 16, 16);
     glPopMatrix ();
     glShadeModel(GL_SMOOTH);
     /* turn off emision lighting, use only for sky */
@@ -587,6 +592,7 @@ void keyboard(unsigned char key, int x, int y)
     static int lighton = 1;
 
     switch (key) {
+        /*CHANGED: Disabled controls while the player is flying*/
         case 27:
         case 'q':
             //printf("Allocs at the end: %d\n", allocationCounter);
@@ -633,6 +639,9 @@ void keyboard(unsigned char key, int x, int y)
             glutPostRedisplay();
             break;
         case 'w':		// forward motion
+            if(playerState == FLYING){
+                return;
+            }
             oldvpx = vpx;
             oldvpy = vpy;
             oldvpz = vpz;
@@ -647,6 +656,9 @@ void keyboard(unsigned char key, int x, int y)
             glutPostRedisplay();
             break;
         case 's':		// backward motion
+            if(playerState == FLYING){
+                return;
+            }
             oldvpx = vpx;
             oldvpy = vpy;
             oldvpz = vpz;
@@ -661,6 +673,9 @@ void keyboard(unsigned char key, int x, int y)
             glutPostRedisplay();
             break;
         case 'a':		// strafe left motion
+            if(playerState == FLYING){
+                return;
+            }
             oldvpx = vpx;
             oldvpy = vpy;
             oldvpz = vpz;
@@ -671,6 +686,9 @@ void keyboard(unsigned char key, int x, int y)
             glutPostRedisplay();
             break;
         case 'd':		// strafe right motion
+            if(playerState == FLYING){
+                return;
+            }
             oldvpx = vpx;
             oldvpy = vpy;
             oldvpz = vpz;

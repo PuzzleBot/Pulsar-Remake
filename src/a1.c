@@ -107,6 +107,7 @@ int meteorAnimationTimer = 0;
 Boolean playerHasKey = FALSE;
 int playerInvincibilityTimer = 0;
 PlayerState playerState = WALKING;
+Parabola playerLaunchTrajectory;
 
 /*** collisionResponse() ***/
 /* -performs collision detection and response */
@@ -351,12 +352,16 @@ void update() {
             float viewY;
             float viewZ;
 
-            if(flycontrol == 0){
+            if((flycontrol == 0) && (playerState != FLYING)){
                 getViewPosition(&viewX, &viewY, &viewZ);
                 setOldViewPosition(viewX, viewY, viewZ);
                 viewY = viewY + GRAVITY;
                 setViewPosition(viewX, viewY, viewZ);
                 collisionResponse();
+            }
+
+            if(playerState == FLYING){
+                iterateBounceMovement();
             }
 
             /*Wall Movement*/

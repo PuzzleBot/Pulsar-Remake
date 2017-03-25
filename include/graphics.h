@@ -133,7 +133,8 @@ GLubyte  world[WORLDX][WORLDY][WORLDZ];
 #define GREEN_PICKUPS 4
 #define BLUE_PICKUPS 4
 
-#define BOUNCE_HEIGHT 30
+#define BOUNCE_HEIGHT 45
+#define FLYING_SPEED ((playerLaunchTrajectory.xzDistance) / (60 * 5))
 
 #define STARFALL_BLOCKS 12
 #define STARFALL_LOWERBOUND (WORLDY - 10)
@@ -247,6 +248,8 @@ typedef struct{
     double x_end;
     double y_end;
     double z_end;
+
+    double currentTotalStepLength;
 } Parabola;
 
 
@@ -438,3 +441,13 @@ Meteor * deleteMeteorFromList(Meteor * list, Meteor * toDelete);
 void destroyMeteorList(Meteor * list);
 
 Meteor * animateAllMeteors(Meteor * meteorList);
+
+void initiateBounce();
+
+void iterateBounceMovement();
+
+Parabola createParabola(double xStart, double yStart, double zStart, double xEnd, double yEnd, double zEnd, double height);
+
+double parabolaStep(Parabola * parabola, double stepSize);
+
+double calculateHeightAtCurrent(Parabola * parabola);
