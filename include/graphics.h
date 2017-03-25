@@ -426,32 +426,52 @@ Boolean lineIsClear(double startX, double startY, double startZ, double endX, do
 
 /*Gameplay-related functions*/
 
+/*Special collision handler for single blocks (pickups and stepping blocks)*/
 void handleSingleBlock(int * blockX, float * newY, int * blockZ);
 
+/*Handles colliding with a maze door*/
 void mazeDoor();
 
+/*Resets the maze, and places the player at the starting point*/
 void resetMaze();
 
+/*Generates all event block pickups*/
 void generateAllPickups();
 
+/*(Blue block event) Makes blocks rain from the sky randomly*/
 void beginStarfall();
 
+/*Creates a block that will fall to the battlefield*/
 Meteor * createNewMeteor();
 
+/*Adds a falling block to a list, returns the head of the list*/
 Meteor * addMeteorToList(Meteor * list, Meteor * new);
 
+/*Deletes a falling block from a list, returns the head of the list*/
 Meteor * deleteMeteorFromList(Meteor * list, Meteor * toDelete);
 
+/*Destroys a list of falling blocks. (does not reset the pointer to null)*/
 void destroyMeteorList(Meteor * list);
 
+/*Animates one frame of a block falling*/
 Meteor * animateAllMeteors(Meteor * meteorList);
 
+/*Launches the player into the air, destined for a random spot on the map*/
 void initiateBounce();
 
+/*Animates the viewpoint
+soaring majestically through the air like an eagle.
+Pilotting a blimp.*/
 void iterateBounceMovement();
 
+
+/*Trajectory calculation functions*/
+
+/*Creates a parabola with the given roots and height, with x = 0*/
 Parabola createParabola(double xStart, double yStart, double zStart, double xEnd, double yEnd, double zEnd, double height);
 
+/*Increments the current x-value by the given step size, does not let the x value go over its set maximum*/
 double parabolaStep(Parabola * parabola, double stepSize);
 
+/*Gets the y-value at the current x-value*/
 double calculateHeightAtCurrent(Parabola * parabola);
