@@ -110,6 +110,8 @@ int playerInvincibilityTimer = 0;
 PlayerState playerState = WALKING;
 Parabola playerLaunchTrajectory;
 
+int keyBlock[3] = {0};
+
 /*** collisionResponse() ***/
 /* -performs collision detection and response */
 /*  sets new xyz  to position of the viewpoint after collision */
@@ -357,6 +359,14 @@ void update() {
             if(stageCleared == TRUE){
                 mazeDoor();
             }
+
+            if(playerHasKey == FALSE){
+                world[keyBlock[0]][keyBlock[1]][keyBlock[2]] = CUBE_WHITE;
+            }
+            else{
+                world[keyBlock[0]][keyBlock[1]][keyBlock[2]] = CUBE_EMPTY;
+            }
+
 
             if((flycontrol == 0) && (playerState != FLYING)){
                 getViewPosition(&viewX, &viewY, &viewZ);

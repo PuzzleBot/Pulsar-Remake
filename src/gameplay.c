@@ -10,6 +10,8 @@ extern void setViewPosition(float, float, float);
 extern Boolean playerHasKey;
 extern Boolean stageCleared;
 
+extern int keyBlock[3];
+
 Meteor * meteorList = NULL;
 
 extern PlayerState playerState;
@@ -97,8 +99,9 @@ void generateAllPickups(){
     int x, y, z;
 
     /*Place a key*/
-    generateValidSpawnPosition(&x, &y, &z);
-    world[x][y - 1][z] = CUBE_WHITE;
+    generateValidSpawnPosition(&keyBlock[0], &keyBlock[1], &keyBlock[2]);
+    keyBlock[1] = keyBlock[1] - 1;
+    world[keyBlock[0]][keyBlock[1]][keyBlock[2]] = CUBE_WHITE;
 
     /*Teleport pickups*/
     for(i = 0; i < RED_PICKUPS; i++){
