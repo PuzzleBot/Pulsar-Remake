@@ -388,6 +388,21 @@ void drawCube(int i, int j, int k) {
         /*ADDED: Meteor*/
         glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, black);
     }
+    else if (world[i][j][k] == 11) {
+        /*ADDED: Meteor*/
+        glMaterialfv(GL_FRONT, GL_AMBIENT, dred);
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, red);
+    }
+    else if (world[i][j][k] == 12) {
+        /*ADDED: Meteor*/
+        glMaterialfv(GL_FRONT, GL_AMBIENT, dgreen);
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, green);
+    }
+    else if (world[i][j][k] == 13) {
+        /*ADDED: Meteor*/
+        glMaterialfv(GL_FRONT, GL_AMBIENT, dlightBlue);
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, lightBlue);
+    }
     else{
         glMaterialfv(GL_FRONT, GL_AMBIENT, dyellow);
         glMaterialfv(GL_FRONT, GL_DIFFUSE, yellow);

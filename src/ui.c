@@ -20,6 +20,8 @@ extern Bullet bulletArray[BULLET_ARRAY_SIZE];
 
 extern int playerInvincibilityTimer;
 
+extern Mob * mobList;
+
 
 /*For tracking the transparency of the hit indicator*/
 
@@ -38,19 +40,26 @@ GLfloat orange[]   = {1.0, 0.64, 0.0, 0.5};
 
 GLfloat lightBlue[]  = {0.25, 0.85, 1.0, 0.5};
 
+GLfloat pickupRed[]   = {1.0, 0.0, 0.0, 1.0};
+GLfloat pickupGreen[] = {0.0, 1.0, 0.0, 1.0};
+GLfloat pickupBlue[]  = {0.25, 0.85, 1.0, 1.0};
+
 GLfloat borderColour[] = {0.0, 0.0, 0.0, 1.0};
 GLfloat playerColour[] = {1.0, 1.0, 0.0, 1.0};
 GLfloat bulletColour[] = {0.0, 1.0, 1.0, 1.0};
+
+GLfloat orbiterColour[] = {1.0, 1.0, 0.0, 1.0};
+GLfloat orbiterRingColour[] = {1.0, 0.64, 0.0, 1.0};
+GLfloat pulsarColour[] = {1.0, 0.0, 0.0, 1.0};
 
 GLfloat transparentColour[] = {0.0, 0.0, 0.0, 0.0};
 GLfloat hitIndicatorColour[] = {1.0, 0.0, 0.0, 0.0};
 
 void drawSmallMinimap(){
     float vpX, vpY, vpZ;
-
     int i, j, k;
-
     int currentBufferValue = 0;
+    Mob * currentMob = mobList;
 
     /*Array acting like a z-buffer for the map, except it uses
      the height (y) instead.
@@ -69,6 +78,9 @@ void drawSmallMinimap(){
     int bulletSquareLeft;
     int bulletSquareBottom;
 
+    int mobSquareLeft;
+    int mobSquareBottom;
+
 
     /*Draw the player*/
     getViewPosition(&vpX, &vpY, &vpZ);
@@ -84,6 +96,53 @@ void drawSmallMinimap(){
               playerSquareBottom,
               (playerSquareLeft) + UI_PLAYER_DIM_HORIZ,
               (playerSquareBottom) + UI_PLAYER_DIM_VERT);
+
+    /*Draw mobs*/
+    while(currentMob != NULL){
+        mobSquareLeft = UI_MAP_RIGHT - ((int)currentMob->x_pos - LEFTWALL + 2)*UI_SQUARE_DIM_HORIZ;
+        mobSquareBottom = UI_MAP_BOTTOM + ((int)currentMob->z_pos - BOTTOMWALL - 1)*UI_SQUARE_DIM_VERT;
+        if(currentMob->type == ORBITER){
+            set2Dcolour(orbiterColour);
+            draw2Dbox(mobSquareLeft + (UI_SQUARE_DIM_HORIZ),
+                      mobSquareBottom + (UI_SQUARE_DIM_HORIZ),
+                      mobSquareLeft + (UI_SQUARE_DIM_HORIZ*2),
+                      mobSquareBottom + (UI_SQUARE_DIM_VERT*2));
+            set2Dcolour(black);
+            draw2Dbox(mobSquareLeft + (UI_SQUARE_DIM_HORIZ*0.5),
+                      mobSquareBottom + (UI_SQUARE_DIM_HORIZ*0.5),
+                      mobSquareLeft + (UI_SQUARE_DIM_HORIZ*2.6),
+                      mobSquareBottom + (UI_SQUARE_DIM_VERT*2.6));
+            set2Dcolour(orbiterRingColour);
+            draw2Dbox(mobSquareLeft,
+                      mobSquareBottom,
+                      mobSquareLeft + (UI_SQUARE_DIM_HORIZ*3),
+                      mobSquareBottom + (UI_SQUARE_DIM_VERT*3));
+        }
+        else{
+            set2Dcolour(pulsarColour);
+            draw2Dline(mobSquareLeft,
+                       mobSquareBottom,
+                       mobSquareLeft + (UI_SQUARE_DIM_HORIZ*3),
+                       mobSquareBottom + (UI_SQUARE_DIM_VERT*3),
+                       ((UI_SQUARE_DIM_HORIZ + UI_SQUARE_DIM_VERT)) / (2 * 2));
+            draw2Dline(mobSquareLeft,
+                       mobSquareBottom + (UI_SQUARE_DIM_VERT*3),
+                       mobSquareLeft + (UI_SQUARE_DIM_HORIZ*3),
+                       mobSquareBottom,
+                       ((UI_SQUARE_DIM_HORIZ + UI_SQUARE_DIM_VERT)) / (2 * 2));
+            set2Dcolour(black);
+            draw2Dbox(mobSquareLeft + (UI_SQUARE_DIM_HORIZ*0.9),
+                      mobSquareBottom + (UI_SQUARE_DIM_HORIZ*0.9),
+                      mobSquareLeft + (UI_SQUARE_DIM_HORIZ*2.1),
+                      mobSquareBottom + (UI_SQUARE_DIM_VERT*2.1));
+            set2Dcolour(pulsarColour);
+            draw2Dbox(mobSquareLeft + (UI_SQUARE_DIM_HORIZ*0.6),
+                      mobSquareBottom + (UI_SQUARE_DIM_HORIZ*0.6),
+                      mobSquareLeft + (UI_SQUARE_DIM_HORIZ*2.3),
+                      mobSquareBottom + (UI_SQUARE_DIM_VERT*2.3));
+        }
+        currentMob = currentMob->next;
+    }
 
 
     /*Draw projectiles*/
@@ -137,17 +196,9 @@ void drawSmallMinimap(){
                 if((world[i][j][k] != 0) && (ui_Ybuffer[i][k] < currentBufferValue)){
                     /*Select a colour to match the world's cube colour*/
                     switch(world[i][j][k]){
-                        case 1:
-                            /*Blue*/
-                            set2Dcolour(green);
-                            break;
                         case 2:
                             /*Blue*/
                             set2Dcolour(blue);
-                            break;
-                        case 3:
-                            /*Red (Pulsar)*/
-                            set2Dcolour(red);
                             break;
                         case 4:
                             /*Black*/
@@ -161,17 +212,18 @@ void drawSmallMinimap(){
                             /*Purple*/
                             set2Dcolour(purple);
                             break;
-                        case 7:
-                            /*Orbiter particle*/
-                            set2Dcolour(orange);
-                            break;
-                        case 8:
-                            /*Orbiter core*/
-                            set2Dcolour(yellow);
-                            break;
                         case 9:
                             /*Light Blue*/
                             set2Dcolour(lightBlue);
+                            break;
+                        case 11:
+                            set2Dcolour(pickupRed);
+                            break;
+                        case 12:
+                            set2Dcolour(pickupGreen);
+                            break;
+                        case 13:
+                            set2Dcolour(pickupBlue);
                             break;
                         default:
                             /*Black*/
@@ -208,10 +260,9 @@ void drawSmallMinimap(){
 
 void drawFullMap(){
     float vpX, vpY, vpZ;
-
     int i, j, k;
-
     int currentBufferValue = 0;
+    Mob * currentMob = mobList;
 
     /*Array acting like a z-buffer for the map, except it uses
      the height (y) instead.
@@ -230,6 +281,9 @@ void drawFullMap(){
     int bulletSquareLeft;
     int bulletSquareBottom;
 
+    int mobSquareLeft;
+    int mobSquareBottom;
+
     /*Draw the player*/
     getViewPosition(&vpX, &vpY, &vpZ);
     vpX = -vpX;
@@ -244,6 +298,53 @@ void drawFullMap(){
               playerSquareBottom,
               (playerSquareLeft) + UI_FULLPLAYER_DIM_HORIZ,
               (playerSquareBottom) + UI_FULLPLAYER_DIM_VERT);
+
+    /*Draw mobs*/
+    while(currentMob != NULL){
+        mobSquareLeft = UI_FULLMAP_RIGHT - ((int)currentMob->x_pos - LEFTWALL + 2)*UI_FULLSQUARE_DIM_HORIZ;
+        mobSquareBottom = UI_FULLMAP_BOTTOM + ((int)currentMob->z_pos - BOTTOMWALL - 1)*UI_FULLSQUARE_DIM_VERT;
+        if(currentMob->type == ORBITER){
+            set2Dcolour(orbiterColour);
+            draw2Dbox(mobSquareLeft + (UI_FULLSQUARE_DIM_HORIZ),
+                      mobSquareBottom + (UI_FULLSQUARE_DIM_HORIZ),
+                      mobSquareLeft + (UI_FULLSQUARE_DIM_HORIZ*2),
+                      mobSquareBottom + (UI_FULLSQUARE_DIM_VERT*2));
+            set2Dcolour(black);
+            draw2Dbox(mobSquareLeft + (UI_FULLSQUARE_DIM_HORIZ*0.5),
+                      mobSquareBottom + (UI_FULLSQUARE_DIM_HORIZ*0.5),
+                      mobSquareLeft + (UI_FULLSQUARE_DIM_HORIZ*2.6),
+                      mobSquareBottom + (UI_FULLSQUARE_DIM_VERT*2.6));
+            set2Dcolour(orbiterRingColour);
+            draw2Dbox(mobSquareLeft,
+                      mobSquareBottom,
+                      mobSquareLeft + (UI_FULLSQUARE_DIM_HORIZ*3),
+                      mobSquareBottom + (UI_FULLSQUARE_DIM_VERT*3));
+        }
+        else{
+            set2Dcolour(pulsarColour);
+            draw2Dline(mobSquareLeft,
+                       mobSquareBottom,
+                       mobSquareLeft + (UI_FULLSQUARE_DIM_HORIZ*3),
+                       mobSquareBottom + (UI_FULLSQUARE_DIM_VERT*3),
+                       ((UI_FULLSQUARE_DIM_HORIZ + UI_FULLSQUARE_DIM_VERT)) / (2 * 2));
+            draw2Dline(mobSquareLeft,
+                       mobSquareBottom + (UI_FULLSQUARE_DIM_VERT*3),
+                       mobSquareLeft + (UI_FULLSQUARE_DIM_HORIZ*3),
+                       mobSquareBottom,
+                       ((UI_FULLSQUARE_DIM_HORIZ + UI_FULLSQUARE_DIM_VERT)) / (2 * 2));
+            set2Dcolour(black);
+            draw2Dbox(mobSquareLeft + (UI_FULLSQUARE_DIM_HORIZ*0.9),
+                      mobSquareBottom + (UI_FULLSQUARE_DIM_HORIZ*0.9),
+                      mobSquareLeft + (UI_FULLSQUARE_DIM_HORIZ*2.1),
+                      mobSquareBottom + (UI_FULLSQUARE_DIM_VERT*2.1));
+            set2Dcolour(pulsarColour);
+            draw2Dbox(mobSquareLeft + (UI_FULLSQUARE_DIM_HORIZ*0.6),
+                      mobSquareBottom + (UI_FULLSQUARE_DIM_HORIZ*0.6),
+                      mobSquareLeft + (UI_FULLSQUARE_DIM_HORIZ*2.3),
+                      mobSquareBottom + (UI_FULLSQUARE_DIM_VERT*2.3));
+        }
+        currentMob = currentMob->next;
+    }
 
 
     /*Draw projectiles*/
@@ -296,17 +397,9 @@ void drawFullMap(){
                 if((world[i][j][k] != 0) && (ui_Ybuffer[i][k] < currentBufferValue)){
                     /*Select a colour to match the world's cube colour*/
                     switch(world[i][j][k]){
-                        case 1:
-                            /*Blue*/
-                            set2Dcolour(green);
-                            break;
                         case 2:
                             /*Blue*/
                             set2Dcolour(blue);
-                            break;
-                        case 3:
-                            /*Red (Pulsar)*/
-                            set2Dcolour(red);
                             break;
                         case 4:
                             /*Black*/
@@ -320,17 +413,18 @@ void drawFullMap(){
                             /*Purple*/
                             set2Dcolour(purple);
                             break;
-                        case 7:
-                            /*Orbiter particle*/
-                            set2Dcolour(orange);
-                            break;
-                        case 8:
-                            /*Orbiter core*/
-                            set2Dcolour(yellow);
-                            break;
                         case 9:
                             /*Light Blue*/
                             set2Dcolour(lightBlue);
+                            break;
+                        case 11:
+                            set2Dcolour(pickupRed);
+                            break;
+                        case 12:
+                            set2Dcolour(pickupGreen);
+                            break;
+                        case 13:
+                            set2Dcolour(pickupBlue);
                             break;
                         default:
                             /*Black*/

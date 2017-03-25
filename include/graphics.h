@@ -40,6 +40,9 @@ GLubyte  world[WORLDX][WORLDY][WORLDZ];
 #define CUBE_YELLOW 8
 #define CUBE_LIGHTBLUE 9
 #define CUBE_METEOR 10
+#define CUBE_PICKUP_RED 11
+#define CUBE_PICKUP_GREEN 12
+#define CUBE_PICKUP_BLUE 13
 
 /*Map border calculation generalization:
   bottom = top of the screen - (size of the world in map blocks + downward screen shift)
@@ -108,6 +111,7 @@ GLubyte  world[WORLDX][WORLDY][WORLDZ];
 
 #define STARTING_WALLS 25
 #define WALL_HEIGHT 5
+#define WALL_TOGGLE_COUNT 2
 
 /*Collision and gravity*/
 #define COLLISION_REPULSION 0.15
@@ -123,7 +127,7 @@ GLubyte  world[WORLDX][WORLDY][WORLDZ];
 
 #define MOB_BULLET_ARRAY_START MAX_BULLETS
 #define MOB_MOVEMENT_SPEED 0.40
-#define MOB_SPAWN 5
+#define MOB_SPAWN 6
 
 
 #define INVINICIBILITY_FRAMES 30

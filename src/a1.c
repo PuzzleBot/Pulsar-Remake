@@ -105,6 +105,7 @@ int meteorAnimationTimer = 0;
 
 /*Player state variables*/
 Boolean playerHasKey = FALSE;
+Boolean stageCleared = FALSE;
 int playerInvincibilityTimer = 0;
 PlayerState playerState = WALKING;
 Parabola playerLaunchTrajectory;
@@ -157,7 +158,7 @@ void collisionResponse() {
           no need to do the collision check*/
         if((playerHasKey == TRUE) && (((world[newBlockX][newBlockY][newBlockZ+1] == CUBE_BLACK) && (world[newBlockX][newBlockY][newBlockZ-1] == CUBE_BLACK))
                                         || ((world[newBlockX+1][newBlockY][newBlockZ] == CUBE_BLACK) && (world[newBlockX-1][newBlockY][newBlockZ] == CUBE_BLACK)))){
-            mazeDoor();
+            stageCleared = TRUE;
             return;
         }
 
@@ -337,6 +338,7 @@ void update() {
 
     } else {
         /* your code goes here */
+        int l;
 
         /*Performance cap - 30 FPS*/
         gettimeofday(&currentTime, NULL);
@@ -351,6 +353,10 @@ void update() {
             float viewX;
             float viewY;
             float viewZ;
+
+            if(stageCleared == TRUE){
+                mazeDoor();
+            }
 
             if((flycontrol == 0) && (playerState != FLYING)){
                 getViewPosition(&viewX, &viewY, &viewZ);
@@ -370,10 +376,7 @@ void update() {
                 wallTimer = 0;
 
                 /*Open/close walls at random*/
-                if(!DEBUG_MODE){
-                    toggleRandomWall();
-                    toggleRandomWall();
-                    toggleRandomWall();
+                for(l = 0; l < WALL_TOGGLE_COUNT; l++){
                     toggleRandomWall();
                 }
                 //toggleTwoWalls();*/

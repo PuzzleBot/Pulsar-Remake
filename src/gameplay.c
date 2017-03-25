@@ -8,6 +8,7 @@ extern Mob * mobList;
 extern void getViewPosition(float *, float *, float *);
 extern void setViewPosition(float, float, float);
 extern Boolean playerHasKey;
+extern Boolean stageCleared;
 
 Meteor * meteorList = NULL;
 
@@ -23,19 +24,19 @@ void handleSingleBlock(int * blockX, float * newY, int * blockZ){
             printf("Key get!\n");
             world[*blockX][(int)*newY][*blockZ] = CUBE_EMPTY;
             break;
-        case CUBE_RED:
+        case CUBE_PICKUP_RED:
             /*Random Teleport*/
             randomizeAllMobPositions();
             world[*blockX][(int)*newY][*blockZ] = CUBE_EMPTY;
             //*newY = *newY + 1;
             break;
-        case CUBE_GREEN:
+        case CUBE_PICKUP_GREEN:
             /*Bounce*/
             initiateBounce();
             world[*blockX][(int)*newY][*blockZ] = CUBE_EMPTY;
             //*newY = *newY + 1;
             break;
-        case CUBE_LIGHTBLUE:
+        case CUBE_PICKUP_BLUE:
             /*Meteors*/
             beginStarfall();
             world[*blockX][(int)*newY][*blockZ] = CUBE_EMPTY;
@@ -63,6 +64,7 @@ void mazeDoor(){
         }
 
         resetMaze();
+        stageCleared = FALSE;
     }
 }
 
@@ -101,19 +103,19 @@ void generateAllPickups(){
     /*Teleport pickups*/
     for(i = 0; i < RED_PICKUPS; i++){
         generateValidSpawnPosition(&x, &y, &z);
-        world[x][y - 1][z] = CUBE_RED;
+        world[x][y - 1][z] = CUBE_PICKUP_RED;
     }
 
     /*Aerial Faith Plates (Bounce pads)*/
     for(i = 0; i < GREEN_PICKUPS; i++){
         generateValidSpawnPosition(&x, &y, &z);
-        world[x][y - 1][z] = CUBE_GREEN;
+        world[x][y - 1][z] = CUBE_PICKUP_GREEN;
     }
 
     /*Meteor pickups*/
     for(i = 0; i < BLUE_PICKUPS; i++){
         generateValidSpawnPosition(&x, &y, &z);
-        world[x][y - 1][z] = CUBE_LIGHTBLUE;
+        world[x][y - 1][z] = CUBE_PICKUP_BLUE;
     }
 }
 
@@ -238,7 +240,6 @@ void initiateBounce(){
 
     playerState = FLYING;
     playerLaunchTrajectory = createParabola((double)vpX, (double)vpY, (double)vpZ, xDest, yDest, zDest, BOUNCE_HEIGHT);
-    printf("dist: %.2f,  pos: %.2f, %.2f, %.2f\n", playerLaunchTrajectory.xzDistance, vpX, vpY, vpZ);
 }
 
 
@@ -250,7 +251,6 @@ void iterateBounceMovement(){
         vpX = (float)-(playerLaunchTrajectory.x_start + ((playerLaunchTrajectory.x_end - playerLaunchTrajectory.x_start) * (playerLaunchTrajectory.currentTotalStepLength / playerLaunchTrajectory.xzDistance)));
         vpZ = (float)-(playerLaunchTrajectory.z_start + ((playerLaunchTrajectory.z_end - playerLaunchTrajectory.z_start) * (playerLaunchTrajectory.currentTotalStepLength / playerLaunchTrajectory.xzDistance)));
         setViewPosition(vpX, vpY, vpZ);
-        printf("dist: %.2f,  pos: %.2f, %.2f, %.2f\n", playerLaunchTrajectory.xzDistance, vpX, vpY, vpZ);
     }
     else{
         playerState = WALKING;

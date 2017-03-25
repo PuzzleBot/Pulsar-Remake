@@ -25,7 +25,6 @@ double parabolaStep(Parabola * parabola, double stepSize){
     if(parabola->currentTotalStepLength >= parabola->xzDistance){
         parabola->currentTotalStepLength = parabola->xzDistance - 0.01;
     }
-    printf("%.2f\n", parabola->currentTotalStepLength);
     return calculateHeightAtCurrent(parabola);
 }
 
