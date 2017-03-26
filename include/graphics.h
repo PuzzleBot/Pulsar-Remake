@@ -22,7 +22,7 @@ GLubyte  world[WORLDX][WORLDY][WORLDZ];
 
 #define DEBUG_MODE FALSE
 #define CURSOR_MODE 0
-
+#define TRACEPRINT if(trace == TRUE){printf("Trace!\n");}
 
 /*2D UI constants for the minimap*/
 #define UI_MAP_BORDER_WIDTH 3
@@ -147,7 +147,6 @@ GLubyte  world[WORLDX][WORLDY][WORLDZ];
 
 
 typedef enum{FALSE, TRUE} Boolean;
-
 
 /*Wall state data type*/
 typedef enum{OPEN, OPENING, CLOSED, CLOSING} WallState;

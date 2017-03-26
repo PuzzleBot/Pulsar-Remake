@@ -10,6 +10,8 @@ extern void setViewPosition(float, float, float);
 extern Boolean playerHasKey;
 extern Boolean stageCleared;
 
+extern Boolean trace;
+
 extern int keyBlock[3];
 
 Meteor * meteorList = NULL;
@@ -66,13 +68,13 @@ void mazeDoor(){
         }
 
         resetMaze();
-        stageCleared = FALSE;
     }
 }
 
 void resetMaze(){
     int i, j;
 
+    stageCleared = FALSE;
     buildStaticObjects();
     /*Initialize the walls array*/
     for(i = 0; i < GRIDSIZE+1; i++){
@@ -257,5 +259,6 @@ void iterateBounceMovement(){
     }
     else{
         playerState = WALKING;
+        stageCleared = FALSE;
     }
 }

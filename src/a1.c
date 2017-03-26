@@ -112,6 +112,9 @@ Parabola playerLaunchTrajectory;
 
 int keyBlock[3] = {0};
 
+
+Boolean trace = FALSE;
+
 /*** collisionResponse() ***/
 /* -performs collision detection and response */
 /*  sets new xyz  to position of the viewpoint after collision */
@@ -158,12 +161,12 @@ void collisionResponse() {
     if((world[newBlockX][newBlockY][newBlockZ] != 0) || (world[newBlockX][newBlockY+1][newBlockZ] != 0) || (newBlockX >= WORLDX) || (newBlockX <= 0) || (newBlockY >= WORLDY) || (newBlockY <= 0) || (newBlockZ >= WORLDZ) || (newBlockZ <= 0)){
         /*Door check - if the door is collided with and the player is holding a key, there is
           no need to do the collision check*/
-        if((playerHasKey == TRUE) && (((world[newBlockX][newBlockY][newBlockZ+1] == CUBE_BLACK) && (world[newBlockX][newBlockY][newBlockZ-1] == CUBE_BLACK))
-                                        || ((world[newBlockX+1][newBlockY][newBlockZ] == CUBE_BLACK) && (world[newBlockX-1][newBlockY][newBlockZ] == CUBE_BLACK)))){
+        if((playerHasKey == TRUE) && ((((world[newBlockX][newBlockY][newBlockZ+1] == CUBE_BLACK) && (world[newBlockX][newBlockY][newBlockZ-1] == CUBE_BLACK))
+                                        || ((world[newBlockX+1][newBlockY][newBlockZ] == CUBE_BLACK) && (world[newBlockX-1][newBlockY][newBlockZ] == CUBE_BLACK)))
+                                        && ((world[newBlockX][newBlockY+1][newBlockZ] == CUBE_BLACK) || (world[newBlockX][newBlockY+1][newBlockZ] == CUBE_WHITE)))){
             stageCleared = TRUE;
             return;
         }
-
 
         if(newBlockZ < oldBlockZ){
             /*Climb 1-block high walls*/
@@ -358,6 +361,8 @@ void update() {
 
             if(stageCleared == TRUE){
                 mazeDoor();
+                stageCleared = FALSE;
+                return;
             }
 
             if(playerHasKey == FALSE){
@@ -406,7 +411,6 @@ void update() {
                 wallAnimationTimer = 0;
                 processAllWallAnimations();
             }
-
 
             meteorAnimationTimer++;
             if(meteorAnimationTimer >= FPS_CAP/15){
