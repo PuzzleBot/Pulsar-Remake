@@ -1,0 +1,118 @@
+
+- Assignment 4 - Game Play and Effects
+- ------------------------------------
+- Due. March 24, 2017
+- 
+- Add the key and door mechanic seen in the original Pulsar which allows
+- the player to exit the maze. Add some points on the ground where special
+- effects can occur. Add the enemies to the map.
+- 
+- 
+- 1. Game Play
+- ------------
+- Add the key collection behaviour seen in the original Pulsar game.
+- Randomly place a white cube on the ground somewhere in the maze.
+- This will represent a key.  Draw a white door (using which cubes)
+- in one corner of the maze either as part of the wall or sitting on
+- top of the wall. 
+- 
+- When the player collides with the white cube print out a message stating
+- that the key has been picked up. If you want you can draw something on
+- the screen using 2D graphics to show the player posses the key.
+- 
+- When the player has picked up the key they can then exit the maze by
+- colliding with the door. Check when the player collides with the doorway
+- if they have the key. If both of these things are true then print out a
+- message indicating the maze is complete and reinitialize the maze.
+- If the player intersects with the door and they do not have the key
+- then the program should not do anything in response.
+- 
+- 
+- 2. Effects
+- ----------
+- 
+- Randomly place some cubes in the maze that cause special
+- effects to occur. The cube should be sitting on the ground.
+- When the player collides with the cube the following effects
+- should occur:
+- 
+- Red cube -teleport the enemies to a random location in the maze 
+- (that is not inside a wall).
+- 
+- Green cube -bounce, the player should fly up in the air and land somewhere
+- else in the maze (like teleport with more to see).
+- 
+- Blue cube -cubes fall from the sky. Animate some cubes falling from above
+- around the player. The number of cubes that fall and their location is
+- your choice but create enough that the player can see them. These cubes
+- can be removed when shot. 
+- They falling cubes should probably be the same colour as the ground.
+- They are not required to be effects cubes unless you want to add that
+- functionality to the program. If you do add falling effects cubes then
+- make them the correct colour.
+- 
+- If any of the colours do not show up in your maze then you can change
+- the colour but indicate what the new colours are in your readme file.
+- 
+- Place more than one of each colour cube on the map. Do not make it
+- difficult to find the cubes or it will be difficult to mark the
+- assignment. If it is difficult to find and test the cubes then
+- marks may be deducted.
+- 
+- Draw the location and the colour of the cubes on the map.
+- 
+- 
+- 3. Draw Enemies on the Map
+- --------------------------
+- Draw the enemies from assignment 2 on the map. Pick shapes and colours
+- that make it clear what they are. They don't need to be as complex
+- or animated as the actual agents in the game (although that would look good).
+- 
+- 
+- 4. Shooting Part II
+- -------------------
+- If there is currently no response to the player being shot by the AI
+- then print out a message that indicates when they are shot.  
+- You can draw something on the screen using 2D graphics when this happens
+- if you wish.
+- 
+- 
+- Coding Practices
+- ----------------
+- Write the code using standard stylistic practices. Use functions, 
+- reasonable variable names, and consistent indentation.
+- If the code is difficult for the TA to understand then you
+- will lose marks.
+- 
+- As usual, keep backups of your work using source control software.
+- 
+- 
+- Starting Code
+- -------------
+- The starting code is available on the Courselink site.
+- You can untar the file using tar xf filename.
+- All of the changes to the code can be made in the a4.c file.
+- 
+- Note that the graphics code may be modified for later assignments. If you
+- make changes to the graphics code (in graphics.c or visible.c) then you
+- may have to recode the changes for a later assignment.
+-   
+- 
+- Submitting the Assignment
+- -------------------------
+- NOTE: The assignment is named a4.
+- 
+- Submit the assignment using Courselink. Submit only the source code
+- and the makefile. Bundle the code in a tar file.
+- 
+- Include a makefile that will compile the executable. Name the executable a4.
+-  
+- The TA will unpack your code and type "make". They will then try to
+- run an executable named "./a4".  If the make command or executing a4
+- does not work then you will lose a substantial number of marks.
+- 
+- It is always a good idea to unpack and test the file you are submitting
+- to be sure that what you submit actually compiles. 
+  
+  
+  

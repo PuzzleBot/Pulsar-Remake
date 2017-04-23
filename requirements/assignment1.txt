@@ -1,0 +1,138 @@
+Assignment 1 - Building a Three Dimensional World
+-------------------------------------------------
+Due. January 27, 2017
+
+We are going to recreate the arcade game Pulsar in 3D.
+There are four parts to this assignment. These are building the world, adding
+moving walls, adding gravity, and adding collision detection.
+
+You can find videos of Pulsar on youtube by searching for arcade pulsar.
+
+
+1. World Building
+-----------------
+Create a three dimensional world from cubes. The world is a six by six
+grid of squares which are defined by pillars and walls. Build the
+pillars and walls using the world array in the game engine.
+The ground level for the game only needs to be one unit thick.
+
+The pillars and external walls don’t move so they can be built once. 
+The internal walls will be able to open and close.
+In part four of this assignment you will animate walls opening and
+closing.
+
+Build the internal walls procedurally. Each place between two blue pillars
+should have a chance of having a wall in place. Pick a reasonable probability
+of there be a wall at any location so that it is possible to move around
+the game world and not be stuck in a closed in area all of the time.
+From the game video it looks like 20 to 25 walls might be a good
+number but you should tune the system to make it playable.
+
+Make the walls tall enough that they cannot be seen over in
+first person perspective. 
+
+In the original game it looks like each square on the grid is three by three
+units where one unit is the size of the player. This is probably too small.
+Experiment with different world sizes to make the game more playable.
+
+Start the viewpoint on the ground in one corner of the maze.
+
+
+2. Collision Detection
+----------------------
+Add collision detection so the viewpoint cannot pass into a space
+which is occupied by a cube.
+
+The viewpoint should be able to climb onto cubes which are only
+one unit tall.  If the cube which is collided with does not have
+another cube above it then the viewpoint should move above the cube
+(it should step up on the single cube). If the object collided with
+is two or more cubes tall then the viewpoint should not move on top of it.
+
+Create a few cubes on the ground so that the collision detection and
+gravity can be tested. Create a stack of one, two, and three cubes
+near the starting area so the player can move to the top of the
+stack of three cubes. Gravity will drop the player to the ground
+once they move off the top cube.
+
+It is probably easier to implement collision detection before gravity
+because you can test collisions by moving the viewpoint into the world
+objects. If you implement gravity first then the viewpoint will fall
+through the ground and is difficult to control.
+
+There are more instructions for collision detection in
+Section 4 - Moving Walls.
+
+
+3. Gravity
+----------
+Add gravity to the program so the viewpoint descends to the ground.
+The rate of descent should not be too fast (e.g. 0.1 per update). 
+Note that because the indices are negative, gravity is an increase in y.
+
+Gravity operates like a collision with the ground. If gravity would
+push the viewpoint into an occupied cube then it should not be be allowed
+to move the viewpoint.
+
+
+4. Moving Walls (object animation)
+----------------------------------
+Walls move by sliding into a pillar they adjacent with and then
+sliding out of another location on the same pillar. One wall should move
+approximately every second. Move the walls by updating the world array.
+The walls should open and close at a reasonable rate so the player can
+see them moving. 
+
+If a moving wall collides with the player it should push the player
+out of the way of the wall. The player should be pushed to either
+side of the wall and not get pushed into the pillar as the
+wall closes.
+
+You will need to store the wall information in a data structure and
+update it when the walls move.
+
+
+Coding Practices
+----------------
+Write the code using standard stylistic practices. Use functions, 
+reasonable variable names, and consistent indentation.
+If the code is difficult for the TA to understand then you
+will lose marks.
+
+As usual, keep backups of your work using source control software.
+
+
+Starting Code
+-------------
+The starting code is available on the Courselink site.
+You can untar the file using tar xf filename.
+All of the changes to the code can be made in the a1.c file.
+
+Note that the graphics code may be modified for assignment 2. If you
+make changes to the graphics code (in graphics.c or visible.c) then you
+may have to recode the changes in assignment 2.
+  
+
+Submitting the Assignment
+-------------------------
+Submit the assignment using Courselink. Submit only the source code
+and the makefile. Bundle the code in a tar file.
+
+The assignments will be marked on the Macs in Thorn 2420.
+If you develop your code on a different platform then it is a good
+idea to put the include files in an #ifdef for that system
+so they will still compile on the Macs. Test your program on the
+Macs before you submit it. 
+
+Include the graphics code with your submission. Include a makefile
+that will compile the executable. Name the executable a1.
+ 
+The TA will unpack your code and type "make". They will then try to
+run an executable named "./a1".  If the make command or executing a1
+does not work then you will lose a substantial number of marks.
+
+It is always a good idea to unpack and test the file you are submitting
+to be sure that what you submit actually compiles. 
+ 
+ 
+ 

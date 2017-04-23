@@ -1,0 +1,107 @@
+
+- Assignment 3 - Enemy AI and Animation
+- -------------------------------------
+- Due. March 10, 2017
+- 
+- Add animated opponents to the game which move and shoot at the player.
+- 
+- 
+- 1. AI Opponents - Animation
+- ---------------------------
+- 
+- Create two different types of opponent animations. Draw them by placing
+- values in the world array. You can animate their motion and make them move
+- by updating the values in the world array.
+- 
+- They should have a similar appearance to the enemies in the original Pulsar
+- game given the constraints of the block based environment in which
+- the assignment is written. There is one yellow roundish shape that
+- appears to rotate. There is also a red X shape that appears to pulse.
+- 
+- There should be at least three distinct states for each animation.
+- The player should be able to easily see the animations when they look
+- at the agent. Look at the agents in the original Pulsar game to get an
+- idea of how the animations should appear. 
+- 
+- The agents will need to be drawn with several blocks simultaneously.
+- They are not a single cube. They should occupy several squares at one time.
+- The animation should occur over these squares. For example, a 3x3x3 cube
+- would be a reasonable size for a agent to occupy. They could be larger
+- than this if your environment can hold a larger agent. It would be
+- difficult to make a convincing agent in a 2x2x2 space.
+- 
+- 
+- 2. AI Opponents - Movement and Shooting
+- ---------------------------------------
+- 
+- The algorithm for the AI is:
+- 1. If nothing else is happening the AI agents should move towards an adjacent
+-    cell. The agents cannot move through a wall. If a wall closes in front
+-    of the agent then it should change the cell which it is moving towards.
+-    If they move into another cell and nothing interrupts them then they
+-    should repeat this step with another adjacent square. For the purposes
+-    of the AI a cell is considered the space between four pillars or walls.
+- 2. If the AI see the player they should shoot at it. An AI can see the player
+-    if there is a line of site between the player and the AI in any direction.
+-    Another way to describe this is that the AI can see in all directions
+-    at one time and it does not have a facing direction.
+- 3. If the agent sees the player pointing towards at them then they should move
+-    out of the way.
+- 
+- You will need to use line of site to determine if a the AI and the player
+- can see each other. If there is a block between the player and the agent then
+- they cannot see each other. Use the centre of the agent to determine if
+- there is a line of site between the agent and player.
+- Each AI agent can only have one shot on the screen at a time. 
+- 
+- Have the agents move at a reasonable speed. They should not move so fast that
+- it is difficult to follow or shoot at them. They should not move so slow that
+- it is difficult to see them move. Pick a rate that makes the game playable.
+- 
+- 
+- 
+- Additional Notes
+- ----------------
+- Remove the cubes at the starting locations which were used for testing
+- the player's ability to climb on top of objects from assignment 1.
+- 
+- 
+- Coding Practices
+- ----------------
+- Write the code using standard stylistic practices. Use functions, 
+- reasonable variable names, and consistent indentation.
+- If the code is difficult for the TA to understand then you
+- will lose marks.
+- 
+- As usual, keep backups of your work using source control software.
+- 
+- 
+- Starting Code
+- -------------
+- The starting code is available on the Courselink site.
+- You can untar the file using tar xf filename.
+- All of the changes to the code can be made in the a3.c file.
+- 
+- Note that the graphics code may be modified for later assignments. If you
+- make changes to the graphics code (in graphics.c or visible.c) then you
+- may have to recode the changes for a later assignment.
+-   
+- 
+- Submitting the Assignment
+- -------------------------
+- NOTE: The assignment is named a3.
+- 
+- Submit the assignment using Courselink. Submit only the source code
+- and the makefile. Bundle the code in a tar file.
+- 
+- Include a makefile that will compile the executable. Name the executable a3.
+-  
+- The TA will unpack your code and type "make". They will then try to
+- run an executable named "./a3".  If the make command or executing a3
+- does not work then you will lose a substantial number of marks.
+- 
+- It is always a good idea to unpack and test the file you are submitting
+- to be sure that what you submit actually compiles. 
+-  
+-  
+-  

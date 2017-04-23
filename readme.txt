@@ -1,9 +1,20 @@
 Brandon Tan
-0845538
 
-CIS 4820
-Assignment 4
+Created for CIS 4820
+University of Guelph
 ------------------------
+
+
+------------------------------------
+Compiling and Running the program
+------------------------------------
+
+To compile the program, type "make" into the terminal while
+in the directory that this readme is located in.
+
+After compiling, type either "./a4" or "make run" to run the program.
+
+
 
 -----------------
 File Structure
@@ -11,6 +22,11 @@ File Structure
 include/            - Holds all header files
     graphics.h      - Contains function prototypes for my added functions,
                       data structure definitions, and needed includes
+
+requirements/       - Contains text files detailing the requirements given by
+                      the professor, as this program was developed as part
+                      of four assignments. (These documents were created by
+                      Dr. D. A. Calvert, University of Guelph)
 
 src/                - Holds all source code (.c files)
     a1.c            - Provided a1.c file plus my requried implementations
@@ -37,17 +53,7 @@ src/                - Holds all source code (.c files)
                       
 
 test/               - Contains files used to unit test parts of the program.
-                      (ignore this)
 
-
-------------------------------------
-Compiling and Running the program
-------------------------------------
-
-To compile the program, type "make" into the terminal while
-in the directory that this readme is located in.
-
-After compiling, type either "./a4" or "make run" to run the program.
 
 
 ----------------------
